@@ -10,25 +10,33 @@
     </div>
   <% end %>
 
-  <% controller.permit.each do |attr| %>
+  <% belongs_to_keys = controller.model.reflect_on_all_associations(:belongs_to).index_by { |a| a.foreign_key.to_sym } %>
+  <% permitted_attributes.each do |attr| %>
     <% column = controller.model.columns_hash[attr.to_s] %>
+    <% assoc = belongs_to_keys[attr] %>
     <div class="my-5">
-      <%= form.label attr, class: "block text-sm font-medium text-gray-700" %>
-      <% case column&.type %>
-      <% when :text %>
-        <%= form.text_area attr, rows: 8, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
-      <% when :boolean %>
-        <div class="mt-2">
-          <%= form.check_box attr, class: "rounded border-gray-400" %>
-        </div>
-      <% when :integer, :float, :decimal %>
-        <%= form.number_field attr, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
-      <% when :date %>
-        <%= form.date_field attr, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
-      <% when :datetime %>
-        <%= form.datetime_local_field attr, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+      <% if assoc %>
+        <%= form.label assoc.name, class: "block text-sm font-medium text-gray-700" %>
+        <% display_method = %i[name title label].detect { |m| assoc.klass.method_defined?(m) } || :id %>
+        <%= form.collection_select assoc.foreign_key, assoc.klass.all, :id, display_method, { prompt: "Select #{assoc.klass.model_name.human.downcase}" }, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
       <% else %>
-        <%= form.text_field attr, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+        <%= form.label attr, class: "block text-sm font-medium text-gray-700" %>
+        <% case column&.type %>
+        <% when :text %>
+          <%= form.text_area attr, rows: 8, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+        <% when :boolean %>
+          <div class="mt-2">
+            <%= form.check_box attr, class: "rounded border-gray-400" %>
+          </div>
+        <% when :integer, :float, :decimal %>
+          <%= form.number_field attr, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+        <% when :date %>
+          <%= form.date_field attr, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+        <% when :datetime %>
+          <%= form.datetime_local_field attr, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+        <% else %>
+          <%= form.text_field attr, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+        <% end %>
       <% end %>
     </div>
   <% end %>

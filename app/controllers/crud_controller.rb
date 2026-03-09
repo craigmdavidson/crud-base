@@ -3,14 +3,27 @@ class CrudController < ApplicationController
   class_attribute :scope, instance_writer: false
   class_attribute :permit, instance_writer: false, default: []
   class_attribute :after_save_redirect_to, instance_writer: false, default: :show
+  @sidebar_controllers = []
 
   class << self
     def allow_unauthenticated=(actions)
       allow_unauthenticated_access only: actions if actions.present?
     end
+
+    def sidebar_controllers
+      CrudController.instance_variable_get(:@sidebar_controllers)
+    end
+
+    def sidebar=(value)
+      if value
+        sidebar_controllers << self unless sidebar_controllers.include?(self)
+      else
+        sidebar_controllers.delete(self)
+      end
+    end
   end
 
-  helper_method :resource, :resources
+  helper_method :resource, :resources, :permitted_attributes
 
   def index
     self.resources = resource_scope.all
@@ -58,10 +71,13 @@ class CrudController < ApplicationController
     return model.all unless scope
 
     result = instance_exec(&scope)
-    if result.is_a?(Class) && result < ApplicationRecord
-      parent_record.public_send(model.model_name.plural)
-    elsif authenticated?
+    case result
+    when ActiveRecord::Relation
       result
+    when ApplicationRecord
+      result.public_send(model.model_name.plural)
+    when Class
+      parent_record.public_send(model.model_name.plural) if result < ApplicationRecord
     else
       model.all
     end
@@ -87,8 +103,14 @@ class CrudController < ApplicationController
     end
   end
 
+  def permitted_attributes
+    attrs = permit || model.column_names.map(&:to_sym) - [:id, :created_at, :updated_at]
+    belongs_to_keys = model.reflect_on_all_associations(:belongs_to).map { |a| a.foreign_key.to_sym }
+    attrs | belongs_to_keys
+  end
+
   def resource_params
-    params.require(model.model_name.param_key).permit(permit)
+    params.require(model.model_name.param_key).permit(permitted_attributes)
   end
 
   def resource

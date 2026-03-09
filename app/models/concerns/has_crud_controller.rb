@@ -2,7 +2,7 @@ module HasCrudController
   extend ActiveSupport::Concern
 
   class_methods do
-    def has_crud_controller(model: self, scope: nil, permit: [], allow_unauthenticated: [], after_save_redirect_to: :show, controller_name: nil)
+    def has_crud_controller(model: self, scope: nil, permit: nil, allow_unauthenticated: [], after_save_redirect_to: :show, sidebar: true, controller_name: nil)
       controller_name ||= "#{model.name.pluralize}Controller"
 
       controller_class = Class.new(CrudController) do
@@ -13,6 +13,7 @@ module HasCrudController
       end
 
       controller_class.allow_unauthenticated = allow_unauthenticated if allow_unauthenticated.present?
+      controller_class.sidebar = sidebar
 
       Object.const_set(controller_name, controller_class)
     end

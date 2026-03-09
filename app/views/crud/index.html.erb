@@ -13,7 +13,7 @@
   <div class="min-w-full mt-5">
     <% resources.each do |record| %>
       <%= link_to url_for(action: :show, id: record), class: "block border-b border-gray-200 py-4 hover:bg-gray-50 -mx-3 px-3 rounded" do %>
-        <% controller.permit.each_with_index do |attr, i| %>
+        <% permitted_attributes.each_with_index do |attr, i| %>
           <% value = record.public_send(attr) %>
           <% if i == 0 %>
             <p class="font-semibold text-lg"><%= value %></p>

@@ -3,6 +3,6 @@ class Post < ApplicationRecord
 
   has_many :comments
 
-  has_crud_controller scope: false,
+  has_crud_controller scope: -> { Current.user },
     permit: [:title, :body], allow_unauthenticated: [:show, :index]
 end
