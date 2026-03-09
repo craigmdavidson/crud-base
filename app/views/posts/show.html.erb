@@ -5,7 +5,10 @@
 <p class="mt-4"><%= @post.body %></p>
 
 
+
 <h2 class="text-2xl mt-8">Comments</h2>
+<%= link_to "Add comment", new_post_comment_path(@post) %>
+
 <div class="mt-2">
 <% @post.comments.each do |comment| %>
   <%= render comment %>
