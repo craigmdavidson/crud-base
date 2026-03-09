@@ -37,10 +37,29 @@
     <%= link_to "Back", url_for(action: :index), class: "text-gray-700 underline hover:no-underline" %>
   </div>
 
-  <% controller.model.reflect_on_all_associations(:has_many).each do |assoc| %>
+  <% has_many_assocs = controller.model.reflect_on_all_associations(:has_many) %>
+  <% if has_many_assocs.any? %>
     <hr class="my-8 border-gray-300">
-    <% child_controller = "#{assoc.name.to_s.camelize}Controller".safe_constantize %>
-    <% child_attrs = (child_controller&.permit || assoc.klass.column_names.map(&:to_sym) - [:id, :created_at, :updated_at]) %>
-    <%= render "table", model: assoc.klass, records: resource.public_send(assoc.name), attrs: child_attrs, parent: resource %>
+    <div class="border-b border-gray-200">
+      <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500" role="tablist">
+        <% has_many_assocs.each_with_index do |assoc, i| %>
+          <li role="presentation">
+            <button class="inline-block p-4 border-b-2 rounded-t-lg <%= i == 0 ? 'text-blue-600 border-blue-600' : 'border-transparent hover:text-gray-600 hover:border-gray-300' %>"
+                    onclick="document.querySelectorAll('[data-tab-panel]').forEach(p => p.classList.add('hidden')); document.querySelectorAll('[role=tab]').forEach(t => { t.classList.remove('text-blue-600','border-blue-600'); t.classList.add('border-transparent'); }); document.getElementById('tab-<%= assoc.name %>').classList.remove('hidden'); this.classList.add('text-blue-600','border-blue-600'); this.classList.remove('border-transparent');"
+                    role="tab">
+              <%= assoc.klass.model_name.human.pluralize %>
+              <span class="ml-1 text-xs text-gray-400">(<%= resource.public_send(assoc.name).size %>)</span>
+            </button>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+    <% has_many_assocs.each_with_index do |assoc, i| %>
+      <div id="tab-<%= assoc.name %>" data-tab-panel class="mt-4 <%= 'hidden' unless i == 0 %>">
+        <% child_controller = "#{assoc.name.to_s.camelize}Controller".safe_constantize %>
+        <% child_attrs = (child_controller&.permit || assoc.klass.column_names.map(&:to_sym) - [:id, :created_at, :updated_at]) %>
+        <%= render "table", model: assoc.klass, records: resource.public_send(assoc.name), attrs: child_attrs, parent: resource %>
+      </div>
+    <% end %>
   <% end %>
 </div>

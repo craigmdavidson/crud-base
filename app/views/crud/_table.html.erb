@@ -1,7 +1,9 @@
 <% records ||= [] %>
 <% attrs ||= [] %>
 <% parent ||= nil %>
-<% new_path = (polymorphic_url([:new, parent, model.model_name.singular.to_sym]) rescue nil) if parent %>
+<% unless defined?(new_path) && new_path %>
+  <% new_path = parent ? (polymorphic_url([:new, parent, model.model_name.singular.to_sym]) rescue nil) : nil %>
+<% end %>
 <% belongs_to_keys = model.reflect_on_all_associations(:belongs_to).index_by { |a| a.foreign_key.to_sym } %>
 
 <div class="bg-white relative shadow-md sm:rounded-lg overflow-hidden">

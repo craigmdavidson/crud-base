@@ -2,6 +2,7 @@ class Address < ApplicationRecord
   has_crud_controller after_save_redirect_to: :index
 
   has_many :people, dependent: :nullify
+  has_many :organizations, dependent: :nullify
 
   def formatted_address
     [
