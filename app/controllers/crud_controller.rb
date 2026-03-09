@@ -77,7 +77,7 @@ class CrudController < ApplicationController
     when ApplicationRecord
       result.public_send(model.model_name.plural)
     when Class
-      parent_record.public_send(model.model_name.plural) if result < ApplicationRecord
+      parent_record ? parent_record.public_send(model.model_name.plural) : model.all
     else
       model.all
     end
@@ -89,7 +89,8 @@ class CrudController < ApplicationController
     result = instance_exec(&scope)
     return unless result.is_a?(Class) && result < ApplicationRecord
 
-    @parent_record ||= result.find(params[:"#{result.model_name.param_key}_id"])
+    parent_id = params[:"#{result.model_name.param_key}_id"]
+    @parent_record ||= result.find(parent_id) if parent_id
   end
 
   def after_save_url
@@ -104,9 +105,13 @@ class CrudController < ApplicationController
   end
 
   def permitted_attributes
-    attrs = permit || model.column_names.map(&:to_sym) - [:id, :created_at, :updated_at]
-    belongs_to_keys = model.reflect_on_all_associations(:belongs_to).map { |a| a.foreign_key.to_sym }
-    attrs | belongs_to_keys
+    if permit
+      permit
+    else
+      attrs = model.column_names.map(&:to_sym) - [:id, :created_at, :updated_at]
+      belongs_to_keys = model.reflect_on_all_associations(:belongs_to).map { |a| a.foreign_key.to_sym }
+      attrs | belongs_to_keys
+    end
   end
 
   def resource_params

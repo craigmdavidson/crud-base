@@ -7,7 +7,9 @@ Rails.application.routes.draw do
   
   resources :people
   resources :addresses
-  resources :organizations
+  resources :organizations do
+    resources :people, module: :organizations
+  end
   
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

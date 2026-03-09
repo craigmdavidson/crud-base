@@ -15,7 +15,11 @@ module HasCrudController
       controller_class.allow_unauthenticated = allow_unauthenticated if allow_unauthenticated.present?
       controller_class.sidebar = sidebar
 
-      Object.const_set(controller_name, controller_class)
+      parts = controller_name.split("::")
+      namespace = parts[0..-2].reduce(Object) do |mod, name|
+        mod.const_defined?(name) ? mod.const_get(name) : mod.const_set(name, Module.new)
+      end
+      namespace.const_set(parts.last, controller_class)
     end
   end
 end
