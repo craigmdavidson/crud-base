@@ -10,7 +10,7 @@
     </div>
   <% end %>
 
-  <% belongs_to_keys = controller.model.reflect_on_all_associations(:belongs_to).index_by { |a| a.foreign_key.to_sym } %>
+  <% belongs_to_keys = controller.model.reflect_on_all_associations(:belongs_to).reject(&:polymorphic?).index_by { |a| a.foreign_key.to_sym } %>
   <% permitted_attributes.each do |attr| %>
     <% column = controller.model.columns_hash[attr.to_s] %>
     <% assoc = belongs_to_keys[attr] %>

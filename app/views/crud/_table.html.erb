@@ -4,7 +4,7 @@
 <% unless defined?(new_path) && new_path %>
   <% new_path = parent ? (polymorphic_url([:new, parent, model.model_name.singular.to_sym]) rescue nil) : nil %>
 <% end %>
-<% belongs_to_keys = model.reflect_on_all_associations(:belongs_to).index_by { |a| a.foreign_key.to_sym } %>
+<% belongs_to_keys = model.reflect_on_all_associations(:belongs_to).reject(&:polymorphic?).index_by { |a| a.foreign_key.to_sym } %>
 
 <div class="bg-white relative shadow-md sm:rounded-lg overflow-hidden">
   <div class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">

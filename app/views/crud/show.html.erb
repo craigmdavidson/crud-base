@@ -3,7 +3,7 @@
     <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
   <% end %>
 
-  <% belongs_to_keys = controller.model.reflect_on_all_associations(:belongs_to).index_by { |a| a.foreign_key.to_sym } %>
+  <% belongs_to_keys = controller.model.reflect_on_all_associations(:belongs_to).reject(&:polymorphic?).index_by { |a| a.foreign_key.to_sym } %>
   <% permitted_attributes.each do |attr| %>
     <% assoc = belongs_to_keys[attr] %>
     <% column = controller.model.columns_hash[attr.to_s] %>

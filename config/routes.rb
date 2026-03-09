@@ -1,14 +1,20 @@
 Rails.application.routes.draw do
+  
+  resource :user
   resource :session
   resources :passwords, param: :token
   resources :posts do
     resources :comments    
   end
   
-  resources :people
+  resources :people do
+    resources :messages, module: :people   
+  end
   resources :addresses
+  resources :messages
   resources :organizations do
     resources :people, module: :organizations
+    resources :messages, module: :organizations
   end
   
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
