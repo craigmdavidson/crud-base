@@ -1,0 +1,56 @@
+<div class="mx-auto md:w-2/3 w-full">
+  <% if notice = flash[:notice] %>
+    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
+  <% end %>
+
+  <% controller.permit.each do |attr| %>
+    <% value = resource.public_send(attr) %>
+    <% column = controller.model.columns_hash[attr.to_s] %>
+    <div class="my-5">
+      <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide"><%= controller.model.human_attribute_name(attr) %></h2>
+      <% if column&.type == :text %>
+        <div class="mt-1 text-lg whitespace-pre-wrap"><%= value %></div>
+      <% else %>
+        <p class="mt-1 text-lg"><%= value %></p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="flex items-center gap-4 mt-8">
+    <% if authenticated? %>
+      <%= link_to "Edit", url_for(action: :edit, id: resource), class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium" %>
+      <%= button_to "Delete", url_for(action: :destroy, id: resource), method: :delete, class: "rounded-md px-3.5 py-2.5 bg-red-600 hover:bg-red-500 text-white font-medium", data: { turbo_confirm: "Are you sure?" } %>
+    <% end %>
+    <%= link_to "Back", url_for(action: :index), class: "text-gray-700 underline hover:no-underline" %>
+  </div>
+
+  <% controller.model.reflect_on_all_associations(:has_many).each do |assoc| %>
+    <hr class="my-8 border-gray-300">
+    <div>
+      <div class="flex justify-between items-center">
+        <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide"><%= assoc.klass.model_name.human.pluralize %></h2>
+        <% if authenticated? %>
+          <%= link_to "New #{assoc.klass.model_name.human.downcase}", [:new, resource, assoc.klass.model_name.singular.to_sym], class: "rounded-md px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium" %>
+        <% end %>
+      </div>
+      <div class="mt-2">
+        <% resource.public_send(assoc.name).each do |child| %>
+          <%= link_to [resource, child], class: "block border-b border-gray-200 py-3 hover:bg-gray-50 -mx-3 px-3 rounded" do %>
+            <% child_controller = "#{assoc.name.to_s.camelize}Controller".safe_constantize %>
+            <% child_attrs = child_controller&.permit || assoc.klass.column_names - %w[id created_at updated_at] %>
+            <% child_attrs.each_with_index do |attr, i| %>
+              <% if i == 0 %>
+                <p class="font-medium"><%= child.public_send(attr) %></p>
+              <% else %>
+                <p class="text-gray-600 text-sm mt-1"><%= truncate(child.public_send(attr).to_s, length: 100) %></p>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+        <% if resource.public_send(assoc.name).empty? %>
+          <p class="text-gray-400 italic mt-2">No <%= assoc.klass.model_name.human.pluralize.downcase %> yet.</p>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

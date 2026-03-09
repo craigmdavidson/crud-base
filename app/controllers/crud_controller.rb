@@ -1,0 +1,109 @@
+class CrudController < ApplicationController
+  class_attribute :model, instance_writer: false
+  class_attribute :scope, instance_writer: false
+  class_attribute :permit, instance_writer: false, default: []
+  class_attribute :after_save_redirect_to, instance_writer: false, default: :show
+
+  class << self
+    def allow_unauthenticated=(actions)
+      allow_unauthenticated_access only: actions if actions.present?
+    end
+  end
+
+  helper_method :resource, :resources
+
+  def index
+    self.resources = resource_scope.all
+  end
+
+  def show
+    self.resource = resource_scope.find(params[:id])
+  end
+
+  def new
+    self.resource = resource_scope.new
+  end
+
+  def create
+    self.resource = resource_scope.new(resource_params)
+    if resource.save
+      redirect_to after_save_url, notice: "#{model.model_name.human} was successfully created."
+    else
+      render :new, status: :unprocessable_entity
+    end
+  end
+
+  def edit
+    self.resource = resource_scope.find(params[:id])
+  end
+
+  def update
+    self.resource = resource_scope.find(params[:id])
+    if resource.update(resource_params)
+      redirect_to after_save_url, notice: "#{model.model_name.human} was successfully updated."
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    self.resource = resource_scope.find(params[:id])
+    resource.destroy!
+    redirect_to url_for(action: :index), notice: "#{model.model_name.human} was successfully destroyed."
+  end
+
+  private
+
+  def resource_scope
+    return model.all unless scope
+
+    result = instance_exec(&scope)
+    if result.is_a?(Class) && result < ApplicationRecord
+      parent_record.public_send(model.model_name.plural)
+    elsif authenticated?
+      result
+    else
+      model.all
+    end
+  end
+
+  def parent_record
+    return unless scope
+
+    result = instance_exec(&scope)
+    return unless result.is_a?(Class) && result < ApplicationRecord
+
+    @parent_record ||= result.find(params[:"#{result.model_name.param_key}_id"])
+  end
+
+  def after_save_url
+    case self.class.after_save_redirect_to
+    when :index
+      url_for(action: :index)
+    when :parent
+      parent_record
+    else
+      url_for(action: :show, id: resource)
+    end
+  end
+
+  def resource_params
+    params.require(model.model_name.param_key).permit(permit)
+  end
+
+  def resource
+    instance_variable_get(:"@#{model.model_name.singular}")
+  end
+
+  def resource=(value)
+    instance_variable_set(:"@#{model.model_name.singular}", value)
+  end
+
+  def resources
+    instance_variable_get(:"@#{model.model_name.plural}")
+  end
+
+  def resources=(value)
+    instance_variable_set(:"@#{model.model_name.plural}", value)
+  end
+end

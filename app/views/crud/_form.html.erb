@@ -1,0 +1,39 @@
+<%= form_with model: resource, url: (resource.persisted? ? url_for(action: :update, id: resource) : url_for(action: :create)), class: "contents" do |form| %>
+  <% if resource.errors.any? %>
+    <div class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+      <h2><%= pluralize(resource.errors.count, "error") %> prohibited this <%= controller.model.model_name.human.downcase %> from being saved:</h2>
+      <ul class="list-disc ml-5 mt-2">
+        <% resource.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <% controller.permit.each do |attr| %>
+    <% column = controller.model.columns_hash[attr.to_s] %>
+    <div class="my-5">
+      <%= form.label attr, class: "block text-sm font-medium text-gray-700" %>
+      <% case column&.type %>
+      <% when :text %>
+        <%= form.text_area attr, rows: 8, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+      <% when :boolean %>
+        <div class="mt-2">
+          <%= form.check_box attr, class: "rounded border-gray-400" %>
+        </div>
+      <% when :integer, :float, :decimal %>
+        <%= form.number_field attr, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+      <% when :date %>
+        <%= form.date_field attr, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+      <% when :datetime %>
+        <%= form.datetime_local_field attr, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+      <% else %>
+        <%= form.text_field attr, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="inline mt-2">
+    <%= form.submit class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+  </div>
+<% end %>

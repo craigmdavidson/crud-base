@@ -1,0 +1,27 @@
+<div class="mx-auto md:w-2/3 w-full">
+  <% if notice = flash[:notice] %>
+    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
+  <% end %>
+
+  <div class="flex justify-between items-center">
+    <h1 class="font-bold text-4xl"><%= controller.model.model_name.human.pluralize %></h1>
+    <% if authenticated? %>
+      <%= link_to "New #{controller.model.model_name.human.downcase}", url_for(action: :new), class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium" %>
+    <% end %>
+  </div>
+
+  <div class="min-w-full mt-5">
+    <% resources.each do |record| %>
+      <%= link_to url_for(action: :show, id: record), class: "block border-b border-gray-200 py-4 hover:bg-gray-50 -mx-3 px-3 rounded" do %>
+        <% controller.permit.each_with_index do |attr, i| %>
+          <% value = record.public_send(attr) %>
+          <% if i == 0 %>
+            <p class="font-semibold text-lg"><%= value %></p>
+          <% else %>
+            <p class="text-gray-600 text-sm mt-1"><%= truncate(value.to_s, length: 100) %></p>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</div>
