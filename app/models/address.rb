@@ -3,6 +3,7 @@ class Address < ApplicationRecord
 
   has_many :people, dependent: :nullify
   has_many :organizations, dependent: :nullify
+  has_many :messages, as: :messagable, dependent: :destroy  
 
   def formatted_address
     [

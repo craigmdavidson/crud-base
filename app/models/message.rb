@@ -14,6 +14,11 @@ class Message < ApplicationRecord
   has_crud_controller controller_name: "People::MessagesController",
     scope: -> { Person }, permit: [:body],
     after_save_redirect_to: :parent, sidebar: false  
+
+  has_crud_controller controller_name: "Addresses::MessagesController",
+    scope: -> { Address }, permit: [:body],
+    after_save_redirect_to: :parent, sidebar: false  
+
   
   private
     def assign_user

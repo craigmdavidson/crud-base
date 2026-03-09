@@ -10,7 +10,9 @@ Rails.application.routes.draw do
   resources :people do
     resources :messages, module: :people   
   end
-  resources :addresses
+  resources :addresses do
+    resources :messages, module: :addresses
+  end
   resources :messages
   resources :organizations do
     resources :people, module: :organizations
