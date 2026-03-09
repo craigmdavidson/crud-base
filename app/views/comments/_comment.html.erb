@@ -1,0 +1,8 @@
+<div class="flex gap-3 py-3 border-t border-gray-100">
+  <div class="flex-1 min-w-0">
+    <p class="mt-1 text-sm text-gray-700 whitespace-pre-wrap"><%= comment.body %></p>
+    <div class="flex items-center gap-2">
+      <span class="text-xs text-gray-400"><%= time_ago_in_words(comment.created_at) %> ago</span>
+    </div>    
+  </div>
+</div>

@@ -34,8 +34,8 @@
       </thead>
       <tbody>
         <% records.each do |record| %>
-          <% record_path = polymorphic_path(record) %>
-          <tr class="border-b hover:bg-gray-100 cursor-pointer" onclick="Turbo.visit('<%= record_path %>')">
+          <% record_path = polymorphic_path(record) rescue nil %>
+          <tr class="border-b <%= 'hover:bg-gray-100 cursor-pointer' if record_path %>" <%= "onclick=Turbo.visit('#{record_path}')".html_safe if record_path %>>
             <% visible_attrs.each_with_index do |attr, i| %>
               <% assoc = belongs_to_keys[attr] %>
               <% poly_assoc = polymorphic_keys[attr] %>
