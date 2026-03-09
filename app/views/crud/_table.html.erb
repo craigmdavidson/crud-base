@@ -30,7 +30,7 @@
       </thead>
       <tbody>
         <% records.each do |record| %>
-          <% record_path = (polymorphic_path([parent, record]) rescue polymorphic_path(record)) %>
+          <% record_path = polymorphic_path(record) %>
           <tr class="border-b hover:bg-gray-100 cursor-pointer" onclick="Turbo.visit('<%= record_path %>')">
             <% attrs.each_with_index do |attr, i| %>
               <% assoc = belongs_to_keys[attr] %>
