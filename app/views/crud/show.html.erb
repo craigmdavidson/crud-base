@@ -4,8 +4,11 @@
   <% end %>
 
   <% belongs_to_keys = controller.model.reflect_on_all_associations(:belongs_to).reject(&:polymorphic?).index_by { |a| a.foreign_key.to_sym } %>
-  <% permitted_attributes.each do |attr| %>
+  <% polymorphic_keys = controller.model.reflect_on_all_associations(:belongs_to).select(&:polymorphic?).index_by { |a| a.foreign_key.to_sym } %>
+  <% polymorphic_type_cols = polymorphic_keys.values.map { |a| :"#{a.name}_type" }.to_set %>
+  <% permitted_attributes.reject { |a| polymorphic_type_cols.include?(a) }.each do |attr| %>
     <% assoc = belongs_to_keys[attr] %>
+    <% poly_assoc = polymorphic_keys[attr] %>
     <% column = controller.model.columns_hash[attr.to_s] %>
     <div class="my-5">
       <% if assoc %>
@@ -13,6 +16,15 @@
         <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide"><%= assoc.klass.model_name.human %></h2>
         <% if related %>
           <% display_method = %i[name title label].detect { |m| assoc.klass.method_defined?(m) || assoc.klass.column_names.include?(m.to_s) } || :id %>
+          <p class="mt-1 text-lg"><%= link_to related.public_send(display_method), related, class: "text-blue-600 hover:text-blue-500 underline hover:no-underline" %></p>
+        <% else %>
+          <p class="mt-1 text-lg text-gray-400 italic">None</p>
+        <% end %>
+      <% elsif poly_assoc %>
+        <% related = resource.public_send(poly_assoc.name) %>
+        <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide"><%= poly_assoc.name.to_s.humanize %></h2>
+        <% if related %>
+          <% display_method = %i[name title label].detect { |m| related.class.method_defined?(m) || related.class.column_names.include?(m.to_s) } || :id %>
           <p class="mt-1 text-lg"><%= link_to related.public_send(display_method), related, class: "text-blue-600 hover:text-blue-500 underline hover:no-underline" %></p>
         <% else %>
           <p class="mt-1 text-lg text-gray-400 italic">None</p>
@@ -58,6 +70,15 @@
       <div id="tab-<%= assoc.name %>" data-tab-panel class="mt-4 <%= 'hidden' unless i == 0 %>">
         <% child_controller = "#{assoc.name.to_s.camelize}Controller".safe_constantize %>
         <% child_attrs = (child_controller&.permit || assoc.klass.column_names.map(&:to_sym) - [:id, :created_at, :updated_at]) %>
+        <% back_refs = assoc.klass.reflect_on_all_associations(:belongs_to).select { |bt|
+          if bt.polymorphic?
+            assoc.options[:as] && bt.name == assoc.options[:as]
+          else
+            bt.klass == controller.model
+          end
+        } %>
+        <% back_ref_cols = back_refs.flat_map { |bt| bt.polymorphic? ? [bt.foreign_key.to_sym, :"#{bt.name}_type"] : [bt.foreign_key.to_sym] }.to_set %>
+        <% child_attrs = child_attrs.reject { |a| back_ref_cols.include?(a) } %>
         <%= render "table", model: assoc.klass, records: resource.public_send(assoc.name), attrs: child_attrs, parent: resource %>
       </div>
     <% end %>

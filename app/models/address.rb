@@ -11,5 +11,7 @@ class Address < ApplicationRecord
     ].compact_blank.join(", ")
   end
 
-  alias_method :name, :formatted_address
+  def name
+    [address_line_1, city].join(".. ")
+  end
 end

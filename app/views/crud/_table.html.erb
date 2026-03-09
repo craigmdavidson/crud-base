@@ -5,6 +5,9 @@
   <% new_path = parent ? (polymorphic_url([:new, parent, model.model_name.singular.to_sym]) rescue nil) : nil %>
 <% end %>
 <% belongs_to_keys = model.reflect_on_all_associations(:belongs_to).reject(&:polymorphic?).index_by { |a| a.foreign_key.to_sym } %>
+<% polymorphic_keys = model.reflect_on_all_associations(:belongs_to).select(&:polymorphic?).index_by { |a| a.foreign_key.to_sym } %>
+<% polymorphic_type_cols = polymorphic_keys.values.map { |a| :"#{a.name}_type" }.to_set %>
+<% visible_attrs = attrs.reject { |a| polymorphic_type_cols.include?(a) } %>
 
 <div class="bg-white relative shadow-md sm:rounded-lg overflow-hidden">
   <div class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
@@ -22,9 +25,10 @@
     <table class="w-full text-sm text-left text-gray-500">
       <thead class="text-xs text-gray-700 uppercase bg-gray-50">
         <tr>
-          <% attrs.each do |attr| %>
+          <% visible_attrs.each do |attr| %>
             <% assoc = belongs_to_keys[attr] %>
-            <th scope="col" class="px-4 py-3"><%= assoc ? assoc.klass.model_name.human : model.human_attribute_name(attr) %></th>
+            <% poly_assoc = polymorphic_keys[attr] %>
+            <th scope="col" class="px-4 py-3"><%= assoc ? assoc.klass.model_name.human : (poly_assoc ? poly_assoc.name.to_s.humanize : model.human_attribute_name(attr)) %></th>
           <% end %>
         </tr>
       </thead>
@@ -32,14 +36,23 @@
         <% records.each do |record| %>
           <% record_path = polymorphic_path(record) %>
           <tr class="border-b hover:bg-gray-100 cursor-pointer" onclick="Turbo.visit('<%= record_path %>')">
-            <% attrs.each_with_index do |attr, i| %>
+            <% visible_attrs.each_with_index do |attr, i| %>
               <% assoc = belongs_to_keys[attr] %>
+              <% poly_assoc = polymorphic_keys[attr] %>
               <% if i == 0 %>
                 <th scope="row" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap"><%= record.public_send(attr) %></th>
               <% elsif assoc %>
                 <% related = record.public_send(assoc.name) %>
                 <% display_method = %i[name title label].detect { |m| assoc.klass.method_defined?(m) || assoc.klass.column_names.include?(m.to_s) } || :id %>
                 <td class="px-4 py-3"><%= related&.public_send(display_method) %></td>
+              <% elsif poly_assoc %>
+                <% related = record.public_send(poly_assoc.name) %>
+                <% if related %>
+                  <% display_method = %i[name title label].detect { |m| related.class.method_defined?(m) || related.class.column_names.include?(m.to_s) } || :id %>
+                  <td class="px-4 py-3"><%= link_to related.public_send(display_method), polymorphic_path(related), class: "text-blue-600 hover:text-blue-500 underline hover:no-underline", onclick: "event.stopPropagation()" %></td>
+                <% else %>
+                  <td class="px-4 py-3 text-gray-400 italic">None</td>
+                <% end %>
               <% else %>
                 <td class="px-4 py-3"><%= truncate(record.public_send(attr).to_s, length: 100) %></td>
               <% end %>

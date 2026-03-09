@@ -11,7 +11,9 @@
   <% end %>
 
   <% belongs_to_keys = controller.model.reflect_on_all_associations(:belongs_to).reject(&:polymorphic?).index_by { |a| a.foreign_key.to_sym } %>
-  <% permitted_attributes.each do |attr| %>
+  <% polymorphic_type_cols = controller.model.reflect_on_all_associations(:belongs_to).select(&:polymorphic?).map { |a| :"#{a.name}_type" }.to_set %>
+  <% polymorphic_id_cols = controller.model.reflect_on_all_associations(:belongs_to).select(&:polymorphic?).map { |a| a.foreign_key.to_sym }.to_set %>
+  <% permitted_attributes.reject { |a| polymorphic_type_cols.include?(a) || polymorphic_id_cols.include?(a) }.each do |attr| %>
     <% column = controller.model.columns_hash[attr.to_s] %>
     <% assoc = belongs_to_keys[attr] %>
     <div class="my-5">

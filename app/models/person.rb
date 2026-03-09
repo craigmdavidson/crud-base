@@ -10,4 +10,9 @@ class Person < ApplicationRecord
     permit: [:title, :first_name, :last_name, :email, :telephone],
     after_save_redirect_to: :parent,
     sidebar: false
+    
+    
+  def name
+    [first_name, last_name].join(" ")
+  end    
 end
