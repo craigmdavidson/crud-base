@@ -17,7 +17,7 @@
     <div class="my-5">
       <% if assoc %>
         <%= form.label assoc.name, class: "block text-sm font-medium text-gray-700" %>
-        <% display_method = %i[name title label].detect { |m| assoc.klass.method_defined?(m) } || :id %>
+        <% display_method = %i[name title label].detect { |m| assoc.klass.method_defined?(m) || assoc.klass.column_names.include?(m.to_s) } || :id %>
         <%= form.collection_select assoc.foreign_key, assoc.klass.all, :id, display_method, { prompt: "Select #{assoc.klass.model_name.human.downcase}" }, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
       <% else %>
         <%= form.label attr, class: "block text-sm font-medium text-gray-700" %>
