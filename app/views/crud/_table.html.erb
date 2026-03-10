@@ -5,7 +5,7 @@
 <% polymorphic_type_cols = polymorphic_keys.values.map { |a| :"#{a.name}_type" }.to_set %>
 <% visible_attrs = attrs.reject { |a| polymorphic_type_cols.include?(a) } %>
 
-<div class="card card-border bg-base-100">
+<div class="card bg-base-100 border border-base-content/12 rounded-box overflow-hidden">
   <div class="overflow-x-auto">
     <table class="table table-zebra">
       <thead>

@@ -17,7 +17,10 @@ Rails.application.routes.draw do
   resources :organizations do
     resources :people, module: :organizations
     resources :messages, module: :organizations
+    resources :funds, module: :organizations
   end
+  
+  resources :funds
   
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

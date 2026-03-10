@@ -4,18 +4,18 @@ class Message < ApplicationRecord
   
   before_validation :assign_user
 
-  has_crud_controller scope: -> { Current.user },
+  has_auto_controller scope: -> { Current.user },
     after_save_redirect_to: :parent, sidebar: false
   
-  has_crud_controller controller_name: "Organizations::MessagesController",
+  has_auto_controller controller_name: "Organizations::MessagesController",
     scope: -> { Organization }, permit: [:body],
     after_save_redirect_to: :parent, sidebar: false
   
-  has_crud_controller controller_name: "People::MessagesController",
+  has_auto_controller controller_name: "People::MessagesController",
     scope: -> { Person }, permit: [:body],
     after_save_redirect_to: :parent, sidebar: false  
 
-  has_crud_controller controller_name: "Addresses::MessagesController",
+  has_auto_controller controller_name: "Addresses::MessagesController",
     scope: -> { Address }, permit: [:body],
     after_save_redirect_to: :parent, sidebar: false  
 

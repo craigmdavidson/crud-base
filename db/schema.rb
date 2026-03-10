@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_09_183539) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_10_153350) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -34,6 +34,21 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_09_183539) do
     t.index ["post_id"], name: "index_comments_on_post_id"
   end
 
+  create_table "funds", force: :cascade do |t|
+    t.bigint "organization_id", null: false
+    t.string "name"
+    t.string "code"
+    t.date "start_date"
+    t.date "end_date"
+    t.decimal "total_fund", precision: 10, scale: 2
+    t.decimal "research_allocation", precision: 10, scale: 2
+    t.decimal "operations_expense_allocation", precision: 10, scale: 2
+    t.decimal "program_delivery_allocation", precision: 10, scale: 2
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["organization_id"], name: "index_funds_on_organization_id"
+  end
+
   create_table "messages", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "messagable_type", null: false
@@ -50,6 +65,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_09_183539) do
     t.bigint "address_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "code"
+    t.string "business_number"
+    t.string "legal_name"
+    t.string "trading_name"
     t.index ["address_id"], name: "index_organizations_on_address_id"
   end
 
@@ -96,6 +115,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_09_183539) do
   end
 
   add_foreign_key "comments", "posts"
+  add_foreign_key "funds", "organizations"
   add_foreign_key "messages", "users"
   add_foreign_key "organizations", "addresses"
   add_foreign_key "people", "addresses"

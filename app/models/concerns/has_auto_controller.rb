@@ -1,8 +1,8 @@
-module HasCrudController
+module HasAutoController
   extend ActiveSupport::Concern
 
   class_methods do
-    def has_crud_controller(model: self, scope: nil, permit: nil, allow_unauthenticated: [], after_save_redirect_to: :show, sidebar: true, controller_name: nil)
+    def has_auto_controller(model: self, scope: nil, permit: nil, allow_unauthenticated: [], after_save_redirect_to: :show, sidebar: true, controller_name: nil)
       controller_name ||= "#{model.name.pluralize}Controller"
 
       controller_class = Class.new(CrudController) do
