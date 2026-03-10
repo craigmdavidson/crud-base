@@ -35,14 +35,23 @@ class CrudController < ApplicationController
 
   def new
     self.resource = resource_scope.new
+    render :inline_new, layout: false if params[:inline].present?
   end
 
   def create
     self.resource = resource_scope.new(resource_params)
     if resource.save
-      redirect_to after_save_url, notice: "#{model.model_name.human} was successfully created."
+      if params[:inline].present?
+        render :inline_created, layout: false
+      else
+        redirect_to after_save_url, notice: "#{model.model_name.human} was successfully created."
+      end
     else
-      render :new, status: :unprocessable_entity
+      if params[:inline].present?
+        render :inline_new, layout: false, status: :unprocessable_entity
+      else
+        render :new, status: :unprocessable_entity
+      end
     end
   end
 
