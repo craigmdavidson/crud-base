@@ -32,10 +32,11 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="min-h-screen bg-base-200">
+  <body class="min-h-screen bg-base-200" data-controller="sidebar">
     <%= render "layouts/navbar" %>
+    <%= render "layouts/sidebar" %>
 
-    <main class="mt-6 p-5">
+    <main class="sm:ml-64 mt-6 p-5">
       <%= yield %>
     </main>
   </body>

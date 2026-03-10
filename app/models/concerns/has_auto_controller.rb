@@ -21,7 +21,7 @@ module HasAutoController
       has_auto_controller(**options, sidebar: false, _skip_route_registration: true)
     end
 
-    def has_auto_controller(model: self, scope: nil, permit: nil, allow_unauthenticated: [], after_save_redirect_to: :show, sidebar: true, controller_name: nil, _skip_route_registration: false)
+    def has_auto_controller(model: self, scope: nil, permit: nil, allow_unauthenticated: [], after_save_redirect_to: :show, sidebar: true, controller_name: nil, layout: nil, _skip_route_registration: false)
       controller_name ||= "#{model.name.pluralize}Controller"
 
       controller_class = Class.new(AutoController) do
@@ -29,6 +29,7 @@ module HasAutoController
         self.scope = scope
         self.permit = permit
         self.after_save_redirect_to = after_save_redirect_to
+        layout(layout) if layout
       end
 
       controller_class.allow_unauthenticated = allow_unauthenticated if allow_unauthenticated.present?

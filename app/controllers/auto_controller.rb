@@ -1,4 +1,6 @@
 class AutoController < ApplicationController
+  layout "auto"
+
   class_attribute :model, instance_writer: false
   class_attribute :scope, instance_writer: false
   class_attribute :permit, instance_writer: false, default: []
