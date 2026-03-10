@@ -9,9 +9,11 @@ module ApplicationHelper
       email[0].upcase
     end
 
-    tag.div(class: "relative inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white text-sm font-semibold shrink-0 overflow-hidden") do
-      tag.span(initials) +
-      tag.img(src: gravatar_url, alt: "", class: "absolute inset-0 w-full h-full rounded-full object-cover", onerror: "this.remove()", loading: "lazy")
+    tag.div(class: "avatar avatar-placeholder") do
+      tag.div(class: "bg-neutral text-neutral-content w-8 h-8 rounded-full relative overflow-hidden") do
+        tag.span(initials, class: "text-xs") +
+        tag.img(src: gravatar_url, alt: "", class: "absolute inset-0 w-full h-full rounded-full object-cover", onerror: "this.remove()", loading: "lazy")
+      end
     end
   end
 end

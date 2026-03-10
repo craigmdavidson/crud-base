@@ -1,10 +1,10 @@
-<div class="flex gap-3 py-3 <%= "border-t border-gray-100" unless message_counter == 0 %>">
+<div class="flex gap-3 py-3 <%= "border-t border-base-200" unless message_counter == 0 %>">
   <%= avatar_for(message.user, size: 40) %>
   <div class="flex-1 min-w-0">
     <div class="flex items-center gap-2">
-      <span class="text-sm font-semibold text-gray-900"><%= message.user.name.presence || message.user.email_address %></span>
-      <span class="text-xs text-gray-400"><%= time_ago_in_words(message.created_at) %> ago</span>
+      <span class="text-sm font-semibold"><%= message.user.name.presence || message.user.email_address %></span>
+      <span class="text-xs text-base-content/50"><%= time_ago_in_words(message.created_at) %> ago</span>
     </div>
-    <p class="mt-1 text-sm text-gray-700 whitespace-pre-wrap"><%= message.body %></p>
+    <p class="mt-1 text-sm text-base-content/80 whitespace-pre-wrap"><%= message.body %></p>
   </div>
 </div>

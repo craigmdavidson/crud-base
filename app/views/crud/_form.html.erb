@@ -1,13 +1,16 @@
 <%= form_with model: resource, url: (resource.persisted? ? url_for(action: :update, id: resource) : url_for(action: :create)), class: "contents" do |form| %>
   <%= hidden_field_tag :inline, 1 if params[:inline].present? %>
   <% if resource.errors.any? %>
-    <div class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= pluralize(resource.errors.count, "error") %> prohibited this <%= controller.model.model_name.human.downcase %> from being saved:</h2>
-      <ul class="list-disc ml-5 mt-2">
-        <% resource.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
+    <div role="alert" class="alert alert-error mt-3">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+      <div>
+        <h2><%= pluralize(resource.errors.count, "error") %> prohibited this <%= controller.model.model_name.human.downcase %> from being saved:</h2>
+        <ul class="list-disc ml-5 mt-2">
+          <% resource.errors.each do |error| %>
+            <li><%= error.full_message %></li>
+          <% end %>
+        </ul>
+      </div>
     </div>
   <% end %>
 
@@ -22,51 +25,54 @@
         <% display_method = %i[name title label].detect { |m| assoc.klass.method_defined?(m) || assoc.klass.column_names.include?(m.to_s) } || :id %>
         <% new_url = url_for(controller: "/#{assoc.klass.model_name.route_key}", action: :new, inline: 1) rescue nil %>
         <div <%= "data-controller=nested-new data-nested-new-url-value=#{new_url}" if new_url %>>
-          <%= form.label assoc.name, class: "block text-sm font-medium text-gray-700" %>
-          <div class="flex gap-2 mt-2">
-            <%= form.collection_select assoc.foreign_key, assoc.klass.all, :id, display_method, { prompt: "Select #{assoc.klass.model_name.human.downcase}" }, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 w-full", data: { nested_new_target: "select" } %>
-            <% if new_url %>
-              <button type="button" data-action="nested-new#open" class="rounded-md px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm shrink-0">+</button>
-            <% end %>
-          </div>
+          <fieldset class="fieldset">
+            <legend class="fieldset-legend"><%= controller.model.human_attribute_name(assoc.name) %></legend>
+            <div class="flex gap-2">
+              <%= form.collection_select assoc.foreign_key, assoc.klass.all, :id, display_method, { prompt: "Select #{assoc.klass.model_name.human.downcase}" }, class: "select w-full", data: { nested_new_target: "select" } %>
+              <% if new_url %>
+                <button type="button" data-action="nested-new#open" class="btn btn-primary shrink-0">+</button>
+              <% end %>
+            </div>
+          </fieldset>
           <% if new_url %>
-            <dialog data-nested-new-target="dialog" data-action="close->nested-new#dialogClosed" class="rounded-lg shadow-xl backdrop:bg-gray-900/50 p-0 w-full max-w-lg">
-              <div class="p-6">
+            <dialog data-nested-new-target="dialog" data-action="close->nested-new#dialogClosed" class="modal">
+              <div class="modal-box">
                 <div class="flex justify-between items-center mb-4">
                   <h3 class="font-bold text-lg">New <%= assoc.klass.model_name.human.downcase %></h3>
-                  <button type="button" data-action="nested-new#close" class="text-gray-400 hover:text-gray-600">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                  </button>
+                  <form method="dialog">
+                    <button class="btn btn-sm btn-circle btn-ghost" aria-label="Close">✕</button>
+                  </form>
                 </div>
                 <turbo-frame id="inline_new_<%= assoc.name %>" data-nested-new-target="frame" data-action="turbo:frame-load->nested-new#handleFrameLoad">
                 </turbo-frame>
               </div>
+              <form method="dialog" class="modal-backdrop"><button>close</button></form>
             </dialog>
           <% end %>
         </div>
       <% else %>
-        <%= form.label attr, class: "block text-sm font-medium text-gray-700" %>
-        <% case column&.type %>
-        <% when :text %>
-          <%= form.text_area attr, rows: 8, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
-        <% when :boolean %>
-          <div class="mt-2">
-            <%= form.check_box attr, class: "rounded border-gray-400" %>
-          </div>
-        <% when :integer, :float, :decimal %>
-          <%= form.number_field attr, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
-        <% when :date %>
-          <%= form.date_field attr, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
-        <% when :datetime %>
-          <%= form.datetime_local_field attr, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
-        <% else %>
-          <%= form.text_field attr, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
-        <% end %>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend"><%= controller.model.human_attribute_name(attr) %></legend>
+          <% case column&.type %>
+          <% when :text %>
+            <%= form.text_area attr, rows: 8, class: "textarea w-full" %>
+          <% when :boolean %>
+            <%= form.check_box attr, class: "checkbox checkbox-primary" %>
+          <% when :integer, :float, :decimal %>
+            <%= form.number_field attr, class: "input w-full" %>
+          <% when :date %>
+            <%= form.date_field attr, class: "input w-full" %>
+          <% when :datetime %>
+            <%= form.datetime_local_field attr, class: "input w-full" %>
+          <% else %>
+            <%= form.text_field attr, class: "input w-full" %>
+          <% end %>
+        </fieldset>
       <% end %>
     </div>
   <% end %>
 
   <div class="inline mt-2">
-    <%= form.submit class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+    <%= form.submit class: "btn btn-primary" %>
   </div>
 <% end %>
