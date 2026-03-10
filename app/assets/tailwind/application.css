@@ -129,3 +129,16 @@
 
 /* Use the data attribute for dark mode */
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *, [data-theme=terminal], [data-theme=terminal] *));
+
+/* Links: dark slate tone with thin underline, thicker on hover */
+.link {
+  color: var(--color-base-content);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--color-base-content);
+  transition: text-decoration-thickness 0.2s ease;
+}
+.link:hover {
+  text-decoration-thickness: 2.5px;
+}

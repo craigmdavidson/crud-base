@@ -1,5 +1,5 @@
-<div class="mx-auto md:w-2/3 w-full">
-  <h1 class="font-bold text-4xl">Edit <%= controller.model.model_name.human.downcase %></h1>
+<div class="w-full">
+  <h1 class="font-bold text-2xl">Edit <%= controller.model.model_name.human.downcase %></h1>
   <%= render "form", resource: resource %>
   <%= link_to "Back", url_for(action: :show, id: resource), class: "link mt-5 inline-block" %>
 </div>

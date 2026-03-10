@@ -1,10 +1,24 @@
-<div class="mx-auto md:w-2/3 w-full">
+<div class="w-full">
   <% if notice = flash[:notice] %>
-    <div role="alert" class="alert alert-success mb-5" id="notice">
+    <div role="alert" class="alert alert-success mb-5" id="notice" data-controller="toast">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
       <span><%= notice %></span>
     </div>
   <% end %>
+
+  <div class="flex items-center justify-between mb-4">
+    <%= link_to url_for(action: :index), class: "btn btn-ghost btn-sm" do %>
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      Back
+    <% end %>
+    <div class="flex items-center gap-2">
+      <% if authenticated? %>
+        <%= link_to "Edit", url_for(action: :edit, id: resource), class: "btn btn-primary btn-sm" %>
+        <%= button_to "Delete", url_for(action: :destroy, id: resource), method: :delete, class: "btn btn-error btn-sm", data: { turbo_confirm: "Are you sure?" } %>
+      <% end %>
+    </div>
+  </div>
+  <h1 class="font-bold text-2xl mb-4"><%= controller.model.model_name.human %></h1>
 
   <% belongs_to_keys = controller.model.reflect_on_all_associations(:belongs_to).reject(&:polymorphic?).index_by { |a| a.foreign_key.to_sym } %>
   <% polymorphic_keys = controller.model.reflect_on_all_associations(:belongs_to).select(&:polymorphic?).index_by { |a| a.foreign_key.to_sym } %>
@@ -19,7 +33,7 @@
         <h2 class="text-sm font-semibold text-base-content/60 uppercase tracking-wide"><%= assoc.klass.model_name.human %></h2>
         <% if related %>
           <% display_method = %i[name title label].detect { |m| assoc.klass.method_defined?(m) || assoc.klass.column_names.include?(m.to_s) } || :id %>
-          <p class="mt-1 text-lg"><%= link_to related.public_send(display_method), related, class: "link link-primary" %></p>
+          <p class="mt-1 text-lg"><%= link_to related.public_send(display_method), related, class: "link" %></p>
         <% else %>
           <p class="mt-1 text-lg text-base-content/50 italic">None</p>
         <% end %>
@@ -28,7 +42,7 @@
         <h2 class="text-sm font-semibold text-base-content/60 uppercase tracking-wide"><%= poly_assoc.name.to_s.humanize %></h2>
         <% if related %>
           <% display_method = %i[name title label].detect { |m| related.class.method_defined?(m) || related.class.column_names.include?(m.to_s) } || :id %>
-          <p class="mt-1 text-lg"><%= link_to related.public_send(display_method), related, class: "link link-primary" %></p>
+          <p class="mt-1 text-lg"><%= link_to related.public_send(display_method), related, class: "link" %></p>
         <% else %>
           <p class="mt-1 text-lg text-base-content/50 italic">None</p>
         <% end %>
@@ -44,51 +58,54 @@
     </div>
   <% end %>
 
-  <div class="flex items-center gap-4 mt-8">
-    <% if authenticated? %>
-      <%= link_to "Edit", url_for(action: :edit, id: resource), class: "btn btn-primary" %>
-      <%= button_to "Delete", url_for(action: :destroy, id: resource), method: :delete, class: "btn btn-error", data: { turbo_confirm: "Are you sure?" } %>
-    <% end %>
-    <%= link_to "Back", url_for(action: :index), class: "link" %>
-  </div>
-
   <% has_many_assocs = controller.model.reflect_on_all_associations(:has_many) %>
   <% if has_many_assocs.any? %>
     <div class="divider my-8"></div>
-    <div role="tablist" class="tabs tabs-border">
-      <% has_many_assocs.each_with_index do |assoc, i| %>
-        <input type="radio" name="assoc_tabs" role="tab" class="tab" aria-label="<%= assoc.klass.model_name.human.pluralize %> (<%= resource.public_send(assoc.name).size %>)" <%= 'checked' if i == 0 %> />
-        <div role="tabpanel" class="tab-content pt-4">
-          <% child_controller = "#{assoc.name.to_s.camelize}Controller".safe_constantize %>
-          <% child_attrs = (child_controller&.permit || assoc.klass.column_names.map(&:to_sym) - [:id, :created_at, :updated_at]) %>
-          <% back_refs = assoc.klass.reflect_on_all_associations(:belongs_to).select { |bt|
-            if bt.polymorphic?
-              assoc.options[:as] && bt.name == assoc.options[:as]
-            else
-              bt.klass == controller.model
-            end
-          } %>
-          <% back_ref_cols = back_refs.flat_map { |bt| bt.polymorphic? ? [bt.foreign_key.to_sym, :"#{bt.name}_type"] : [bt.foreign_key.to_sym] }.to_set %>
-          <% child_attrs = child_attrs.reject { |a| back_ref_cols.include?(a) } %>
-          <% collection_partial = "#{assoc.klass.model_name.collection}/#{assoc.klass.model_name.singular}" %>
-          <% if lookup_context.exists?(collection_partial, [], true) %>
-            <% new_path = polymorphic_url([:new, resource, assoc.klass.model_name.singular.to_sym]) rescue nil %>
-            <% if authenticated? && new_path %>
-              <div class="flex justify-end mb-3">
-                <%= link_to new_path, class: "btn btn-primary btn-sm" do %>
-                  <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path clip-rule="evenodd" fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
-                  </svg>
-                  New <%= assoc.klass.model_name.human.downcase %>
-                <% end %>
-              </div>
+
+    <div class="border-b border-base-300 mb-4">
+      <div class="flex flex-wrap gap-1 -mb-px">
+        <% has_many_assocs.each_with_index do |assoc, i| %>
+          <button onclick="document.querySelectorAll('[data-tab-panel]').forEach(p=>p.classList.add('hidden'));document.querySelectorAll('[data-tab-btn]').forEach(t=>{t.classList.remove('border-primary','text-primary');t.classList.add('border-transparent')});document.getElementById('tab-<%= assoc.name %>').classList.remove('hidden');this.classList.add('border-primary','text-primary');this.classList.remove('border-transparent')"
+                  data-tab-btn
+                  class="px-4 py-2 text-sm font-medium border-b-2 <%= i == 0 ? 'border-primary text-primary' : 'border-transparent text-base-content/60 hover:text-base-content' %>">
+            <%= assoc.klass.model_name.human.pluralize %> (<%= resource.public_send(assoc.name).size %>)
+          </button>
+        <% end %>
+      </div>
+    </div>
+
+    <% has_many_assocs.each_with_index do |assoc, i| %>
+      <div id="tab-<%= assoc.name %>" data-tab-panel class="<%= 'hidden' unless i == 0 %>">
+        <% child_controller = "#{assoc.name.to_s.camelize}Controller".safe_constantize %>
+        <% child_attrs = (child_controller&.permit || assoc.klass.column_names.map(&:to_sym) - [:id, :created_at, :updated_at]) %>
+        <% back_refs = assoc.klass.reflect_on_all_associations(:belongs_to).select { |bt|
+          if bt.polymorphic?
+            assoc.options[:as] && bt.name == assoc.options[:as]
+          else
+            bt.klass == controller.model
+          end
+        } %>
+        <% back_ref_cols = back_refs.flat_map { |bt| bt.polymorphic? ? [bt.foreign_key.to_sym, :"#{bt.name}_type"] : [bt.foreign_key.to_sym] }.to_set %>
+        <% child_attrs = child_attrs.reject { |a| back_ref_cols.include?(a) } %>
+        <% collection_partial = "#{assoc.klass.model_name.collection}/#{assoc.klass.model_name.singular}" %>
+        <% new_path = polymorphic_url([:new, resource, assoc.klass.model_name.singular.to_sym]) rescue nil %>
+        <div class="flex items-center justify-between mb-3">
+          <span class="font-bold text-lg"><%= assoc.klass.model_name.human.pluralize %></span>
+          <% if authenticated? && new_path %>
+            <%= link_to new_path, class: "btn btn-primary btn-sm" do %>
+              <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path clip-rule="evenodd" fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
+              </svg>
+              New <%= assoc.klass.model_name.human.downcase %>
             <% end %>
-            <%= render partial: collection_partial, collection: resource.public_send(assoc.name) %>
-          <% else %>
-            <%= render "table", model: assoc.klass, records: resource.public_send(assoc.name), attrs: child_attrs, parent: resource %>
           <% end %>
         </div>
-      <% end %>
-    </div>
+        <% if lookup_context.exists?(collection_partial, [], true) %>
+          <%= render partial: collection_partial, collection: resource.public_send(assoc.name) %>
+        <% else %>
+          <%= render "table", model: assoc.klass, records: resource.public_send(assoc.name), attrs: child_attrs %>
+        <% end %>
+      </div>
+    <% end %>
   <% end %>
 </div>

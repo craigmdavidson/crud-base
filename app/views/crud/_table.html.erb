@@ -1,28 +1,11 @@
 <% records ||= [] %>
 <% attrs ||= [] %>
-<% parent ||= nil %>
-<% unless defined?(new_path) && new_path %>
-  <% new_path = parent ? (polymorphic_url([:new, parent, model.model_name.singular.to_sym]) rescue nil) : nil %>
-<% end %>
 <% belongs_to_keys = model.reflect_on_all_associations(:belongs_to).reject(&:polymorphic?).index_by { |a| a.foreign_key.to_sym } %>
 <% polymorphic_keys = model.reflect_on_all_associations(:belongs_to).select(&:polymorphic?).index_by { |a| a.foreign_key.to_sym } %>
 <% polymorphic_type_cols = polymorphic_keys.values.map { |a| :"#{a.name}_type" }.to_set %>
 <% visible_attrs = attrs.reject { |a| polymorphic_type_cols.include?(a) } %>
 
 <div class="card card-border bg-base-100">
-  <div class="card-body p-4">
-    <div class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4">
-      <h3 class="card-title"><%= model.model_name.human.pluralize %></h3>
-      <% if authenticated? && new_path %>
-        <%= link_to new_path, class: "btn btn-primary btn-sm" do %>
-          <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path clip-rule="evenodd" fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
-          </svg>
-          New <%= model.model_name.human.downcase %>
-        <% end %>
-      <% end %>
-    </div>
-  </div>
   <div class="overflow-x-auto">
     <table class="table table-zebra">
       <thead>
@@ -51,7 +34,7 @@
                 <% related = record.public_send(poly_assoc.name) %>
                 <% if related %>
                   <% display_method = %i[name title label].detect { |m| related.class.method_defined?(m) || related.class.column_names.include?(m.to_s) } || :id %>
-                  <td><%= link_to related.public_send(display_method), polymorphic_path(related), class: "link link-primary", onclick: "event.stopPropagation()" %></td>
+                  <td><%= link_to related.public_send(display_method), polymorphic_path(related), class: "link", onclick: "event.stopPropagation()" %></td>
                 <% else %>
                   <td class="text-base-content/50 italic">None</td>
                 <% end %>
