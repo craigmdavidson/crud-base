@@ -15,8 +15,8 @@ module HasAutoController
       child_resource = model_name.route_key.to_sym
       mod = parent_resource
 
-      CrudController.register_root_route(parent_resource)
-      CrudController.register_nested_route(parent_resource, child_resource, mod)
+      AutoController.register_root_route(parent_resource)
+      AutoController.register_nested_route(parent_resource, child_resource, mod)
 
       has_auto_controller(**options, sidebar: false, _skip_route_registration: true)
     end
@@ -24,7 +24,7 @@ module HasAutoController
     def has_auto_controller(model: self, scope: nil, permit: nil, allow_unauthenticated: [], after_save_redirect_to: :show, sidebar: true, controller_name: nil, _skip_route_registration: false)
       controller_name ||= "#{model.name.pluralize}Controller"
 
-      controller_class = Class.new(CrudController) do
+      controller_class = Class.new(AutoController) do
         self.model = model
         self.scope = scope
         self.permit = permit
@@ -41,7 +41,7 @@ module HasAutoController
       namespace.const_set(parts.last, controller_class)
 
       unless _skip_route_registration
-        CrudController.register_root_route(model.model_name.route_key.to_sym)
+        AutoController.register_root_route(model.model_name.route_key.to_sym)
       end
     end
   end

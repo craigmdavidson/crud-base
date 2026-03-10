@@ -1,4 +1,4 @@
-class CrudController < ApplicationController
+class AutoController < ApplicationController
   class_attribute :model, instance_writer: false
   class_attribute :scope, instance_writer: false
   class_attribute :permit, instance_writer: false, default: []
@@ -13,7 +13,7 @@ class CrudController < ApplicationController
     end
 
     def sidebar_controllers
-      CrudController.instance_variable_get(:@sidebar_controllers)
+      AutoController.instance_variable_get(:@sidebar_controllers)
     end
 
     def sidebar=(value)
@@ -25,11 +25,11 @@ class CrudController < ApplicationController
     end
 
     def root_routes
-      CrudController.instance_variable_get(:@root_routes)
+      AutoController.instance_variable_get(:@root_routes)
     end
 
     def nested_routes
-      CrudController.instance_variable_get(:@nested_routes)
+      AutoController.instance_variable_get(:@nested_routes)
     end
 
     def register_root_route(resource_name)
