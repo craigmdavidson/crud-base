@@ -2,6 +2,17 @@ module HasAutoController
   extend ActiveSupport::Concern
 
   class_methods do
+    def has_nested_auto_controllers(for_parents:, **options)
+      for_parents.each { |parent_model| has_nested_auto_controller(parent_model, **options) }
+    end
+
+    def has_nested_auto_controller(parent_model, **options)
+      options[:scope] ||= -> { parent_model }
+      options[:controller_name] ||= "#{parent_model.name.pluralize}::#{name.pluralize}Controller"
+      options[:after_save_redirect_to] ||= :parent
+      has_auto_controller(**options, sidebar: false)
+    end
+
     def has_auto_controller(model: self, scope: nil, permit: nil, allow_unauthenticated: [], after_save_redirect_to: :show, sidebar: true, controller_name: nil)
       controller_name ||= "#{model.name.pluralize}Controller"
 

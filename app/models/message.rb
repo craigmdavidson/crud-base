@@ -7,17 +7,8 @@ class Message < ApplicationRecord
   has_auto_controller scope: -> { Current.user },
     after_save_redirect_to: :parent, sidebar: false
   
-  has_auto_controller controller_name: "Organizations::MessagesController",
-    scope: -> { Organization }, permit: [:body],
-    after_save_redirect_to: :parent, sidebar: false
-  
-  has_auto_controller controller_name: "People::MessagesController",
-    scope: -> { Person }, permit: [:body],
-    after_save_redirect_to: :parent, sidebar: false  
-
-  has_auto_controller controller_name: "Addresses::MessagesController",
-    scope: -> { Address }, permit: [:body],
-    after_save_redirect_to: :parent, sidebar: false  
+  has_nested_auto_controllers for_parents: [Organization, Person, Address],
+    permit: [:body]  
 
   
   private

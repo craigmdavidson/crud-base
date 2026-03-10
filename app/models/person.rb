@@ -5,11 +5,8 @@ class Person < ApplicationRecord
 
   has_auto_controller after_save_redirect_to: :index
 
-  has_auto_controller controller_name: "Organizations::PeopleController",
-    scope: -> { Organization },
-    permit: [:title, :first_name, :last_name, :email, :telephone],
-    after_save_redirect_to: :parent,
-    sidebar: false
+  has_nested_auto_controller Organization,
+    permit: [:title, :first_name, :last_name, :email, :telephone]
     
     
   def name
