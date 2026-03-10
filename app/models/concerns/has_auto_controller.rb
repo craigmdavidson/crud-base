@@ -10,10 +10,18 @@ module HasAutoController
       options[:scope] ||= -> { parent_model }
       options[:controller_name] ||= "#{parent_model.name.pluralize}::#{name.pluralize}Controller"
       options[:after_save_redirect_to] ||= :parent
-      has_auto_controller(**options, sidebar: false)
+
+      parent_resource = parent_model.model_name.route_key.to_sym
+      child_resource = model_name.route_key.to_sym
+      mod = parent_resource
+
+      CrudController.register_root_route(parent_resource)
+      CrudController.register_nested_route(parent_resource, child_resource, mod)
+
+      has_auto_controller(**options, sidebar: false, _skip_route_registration: true)
     end
 
-    def has_auto_controller(model: self, scope: nil, permit: nil, allow_unauthenticated: [], after_save_redirect_to: :show, sidebar: true, controller_name: nil)
+    def has_auto_controller(model: self, scope: nil, permit: nil, allow_unauthenticated: [], after_save_redirect_to: :show, sidebar: true, controller_name: nil, _skip_route_registration: false)
       controller_name ||= "#{model.name.pluralize}Controller"
 
       controller_class = Class.new(CrudController) do
@@ -31,6 +39,10 @@ module HasAutoController
         mod.const_defined?(name) ? mod.const_get(name) : mod.const_set(name, Module.new)
       end
       namespace.const_set(parts.last, controller_class)
+
+      unless _skip_route_registration
+        CrudController.register_root_route(model.model_name.route_key.to_sym)
+      end
     end
   end
 end

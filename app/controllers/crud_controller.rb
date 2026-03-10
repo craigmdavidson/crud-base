@@ -4,6 +4,8 @@ class CrudController < ApplicationController
   class_attribute :permit, instance_writer: false, default: []
   class_attribute :after_save_redirect_to, instance_writer: false, default: :show
   @sidebar_controllers = []
+  @root_routes = []
+  @nested_routes = Hash.new { |h, k| h[k] = [] }
 
   class << self
     def allow_unauthenticated=(actions)
@@ -19,6 +21,43 @@ class CrudController < ApplicationController
         sidebar_controllers << self unless sidebar_controllers.include?(self)
       else
         sidebar_controllers.delete(self)
+      end
+    end
+
+    def root_routes
+      CrudController.instance_variable_get(:@root_routes)
+    end
+
+    def nested_routes
+      CrudController.instance_variable_get(:@nested_routes)
+    end
+
+    def register_root_route(resource_name)
+      root_routes << { name: resource_name } unless root_routes.any? { |r| r[:name] == resource_name }
+    end
+
+    def register_nested_route(parent_resource, child_resource, mod)
+      children = nested_routes[parent_resource]
+      children << { name: child_resource, module: mod } unless children.any? { |c| c[:name] == child_resource && c[:module] == mod }
+    end
+
+    def draw_routes(router)
+      Rails.autoloaders.main.eager_load_dir(Rails.root.join("app/models"))
+
+      drawn_root_routes = root_routes.dup
+      drawn_nested_routes = nested_routes.dup
+
+      router.instance_exec(drawn_root_routes, drawn_nested_routes) do |rr, nr|
+        rr.each do |route|
+          children = nr[route[:name]]
+          if children&.any?
+            resources route[:name] do
+              children.each { |child| resources child[:name], module: child[:module] }
+            end
+          else
+            resources route[:name]
+          end
+        end
       end
     end
   end
