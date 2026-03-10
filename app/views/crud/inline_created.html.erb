@@ -1,0 +1,4 @@
+<% display_method = %i[name title label].detect { |m| controller.model.method_defined?(m) || controller.model.column_names.include?(m.to_s) } || :id %>
+<%= turbo_frame_tag request.headers["Turbo-Frame"] do %>
+  <div data-created-id="<%= resource.id %>" data-created-display="<%= resource.public_send(display_method) %>"></div>
+<% end %>

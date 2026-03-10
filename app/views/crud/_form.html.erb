@@ -1,4 +1,5 @@
 <%= form_with model: resource, url: (resource.persisted? ? url_for(action: :update, id: resource) : url_for(action: :create)), class: "contents" do |form| %>
+  <%= hidden_field_tag :inline, 1 if params[:inline].present? %>
   <% if resource.errors.any? %>
     <div class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
       <h2><%= pluralize(resource.errors.count, "error") %> prohibited this <%= controller.model.model_name.human.downcase %> from being saved:</h2>
@@ -18,9 +19,31 @@
     <% assoc = belongs_to_keys[attr] %>
     <div class="my-5">
       <% if assoc %>
-        <%= form.label assoc.name, class: "block text-sm font-medium text-gray-700" %>
         <% display_method = %i[name title label].detect { |m| assoc.klass.method_defined?(m) || assoc.klass.column_names.include?(m.to_s) } || :id %>
-        <%= form.collection_select assoc.foreign_key, assoc.klass.all, :id, display_method, { prompt: "Select #{assoc.klass.model_name.human.downcase}" }, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+        <% new_url = url_for(controller: "/#{assoc.klass.model_name.route_key}", action: :new, inline: 1) rescue nil %>
+        <div <%= "data-controller=nested-new data-nested-new-url-value=#{new_url}" if new_url %>>
+          <%= form.label assoc.name, class: "block text-sm font-medium text-gray-700" %>
+          <div class="flex gap-2 mt-2">
+            <%= form.collection_select assoc.foreign_key, assoc.klass.all, :id, display_method, { prompt: "Select #{assoc.klass.model_name.human.downcase}" }, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 w-full", data: { nested_new_target: "select" } %>
+            <% if new_url %>
+              <button type="button" data-action="nested-new#open" class="rounded-md px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm shrink-0">+</button>
+            <% end %>
+          </div>
+          <% if new_url %>
+            <dialog data-nested-new-target="dialog" data-action="close->nested-new#dialogClosed" class="rounded-lg shadow-xl backdrop:bg-gray-900/50 p-0 w-full max-w-lg">
+              <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                  <h3 class="font-bold text-lg">New <%= assoc.klass.model_name.human.downcase %></h3>
+                  <button type="button" data-action="nested-new#close" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </button>
+                </div>
+                <turbo-frame id="inline_new_<%= assoc.name %>" data-nested-new-target="frame" data-action="turbo:frame-load->nested-new#handleFrameLoad">
+                </turbo-frame>
+              </div>
+            </dialog>
+          <% end %>
+        </div>
       <% else %>
         <%= form.label attr, class: "block text-sm font-medium text-gray-700" %>
         <% case column&.type %>
