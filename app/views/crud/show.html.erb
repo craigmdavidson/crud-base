@@ -65,10 +65,10 @@
     <div class="border-b border-base-300 mb-4">
       <div class="flex flex-wrap gap-1 -mb-px">
         <% has_many_assocs.each_with_index do |assoc, i| %>
-          <button onclick="document.querySelectorAll('[data-tab-panel]').forEach(p=>p.classList.add('hidden'));document.querySelectorAll('[data-tab-btn]').forEach(t=>{t.classList.remove('border-primary','text-primary');t.classList.add('border-transparent')});document.getElementById('tab-<%= assoc.name %>').classList.remove('hidden');this.classList.add('border-primary','text-primary');this.classList.remove('border-transparent')"
+          <button onclick="document.querySelectorAll('[data-tab-panel]').forEach(p=>p.classList.add('hidden'));document.querySelectorAll('[data-tab-btn]').forEach(t=>{t.classList.remove('border-base-content','text-base-content');t.classList.add('border-transparent','text-base-content/60')});document.getElementById('tab-<%= assoc.name %>').classList.remove('hidden');this.classList.add('border-base-content','text-base-content');this.classList.remove('border-transparent','text-base-content/60')"
                   data-tab-btn
-                  class="px-4 py-2 text-sm font-medium border-b-2 <%= i == 0 ? 'border-primary text-primary' : 'border-transparent text-base-content/60 hover:text-base-content' %>">
-            <%= assoc.klass.model_name.human.pluralize %> (<%= resource.public_send(assoc.name).size %>)
+                  class="px-4 py-2 text-sm font-medium border-b-2 <%= i == 0 ? 'border-base-content text-base-content' : 'border-transparent text-base-content/60 hover:text-base-content' %>">
+            <%= assoc.klass.model_name.human.pluralize %> <span class="badge badge-sm bg-base-300 text-base-content border-0 ml-1"><%= resource.public_send(assoc.name).size %></span>
           </button>
         <% end %>
       </div>

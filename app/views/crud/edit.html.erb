@@ -4,7 +4,9 @@
       <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
       Back
     <% end %>
-    <div></div>
+    <% if authenticated? %>
+      <%= button_to "Delete", url_for(action: :destroy, id: resource), method: :delete, class: "btn btn-error btn-sm", data: { turbo_confirm: "Are you sure?" } %>
+    <% end %>
   </div>
   <h1 class="font-bold text-2xl mb-4">Edit <%= controller.model.model_name.human.downcase %></h1>
   <%= render "form", resource: resource %>

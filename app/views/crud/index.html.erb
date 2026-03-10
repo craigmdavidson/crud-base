@@ -7,7 +7,7 @@
   <% end %>
 
   <div class="flex items-center justify-between mb-4">
-    <h1 class="font-bold text-2xl"><%= controller.model.model_name.human.pluralize %></h1>
+    <h1 class="font-bold text-2xl"><%= controller.model.model_name.human.pluralize %> <span class="badge badge-sm bg-base-300 text-base-content border-0 ml-1"><%= resources.size %></span></h1>
     <% if authenticated? %>
       <%= link_to url_for(action: :new), class: "btn btn-primary btn-sm" do %>
         <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
