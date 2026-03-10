@@ -17,26 +17,11 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <script>
-      (function() {
-        var theme = localStorage.getItem("theme");
-        if (!theme) {
-          theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-        }
-        document.documentElement.setAttribute("data-theme", theme);
-      })();
-    </script>
-
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
-    <%= javascript_importmap_tags %>
   </head>
 
-  <body class="min-h-screen bg-base-200">
-    <%= render "layouts/navbar" %>
-
-    <main class="mt-6 p-5">
-      <%= yield %>
-    </main>
+  <body>
+    <%= yield %>
   </body>
 </html>
