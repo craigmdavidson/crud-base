@@ -4,5 +4,6 @@ class Post < ApplicationRecord
   has_many :comments
 
   has_auto_controller scope: -> { Current.user },
-    permit: [:title, :body], allow_unauthenticated: [:show, :index], sidebar: true, layout: "application"
+    permit: [:title, :body], allow_unauthenticated: [:show, :index], sidebar: true
+    #, layout: "application"
 end

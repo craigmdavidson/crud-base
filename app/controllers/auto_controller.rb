@@ -1,68 +1,7 @@
 class AutoController < ApplicationController
+  include AutoRouteable, Parameterizable, Resourced
+  
   layout "auto"
-
-  class_attribute :model, instance_writer: false
-  class_attribute :scope, instance_writer: false
-  class_attribute :permit, instance_writer: false, default: []
-  class_attribute :after_save_redirect_to, instance_writer: false, default: :show
-  @sidebar_controllers = []
-  @root_routes = []
-  @nested_routes = Hash.new { |h, k| h[k] = [] }
-
-  class << self
-    def allow_unauthenticated=(actions)
-      allow_unauthenticated_access only: actions if actions.present?
-    end
-
-    def sidebar_controllers
-      AutoController.instance_variable_get(:@sidebar_controllers)
-    end
-
-    def sidebar=(value)
-      if value
-        sidebar_controllers << self unless sidebar_controllers.include?(self)
-      else
-        sidebar_controllers.delete(self)
-      end
-    end
-
-    def root_routes
-      AutoController.instance_variable_get(:@root_routes)
-    end
-
-    def nested_routes
-      AutoController.instance_variable_get(:@nested_routes)
-    end
-
-    def register_root_route(resource_name)
-      root_routes << { name: resource_name } unless root_routes.any? { |r| r[:name] == resource_name }
-    end
-
-    def register_nested_route(parent_resource, child_resource, mod)
-      children = nested_routes[parent_resource]
-      children << { name: child_resource, module: mod } unless children.any? { |c| c[:name] == child_resource && c[:module] == mod }
-    end
-
-    def draw_routes(router)
-      Rails.autoloaders.main.eager_load_dir(Rails.root.join("app/models"))
-
-      drawn_root_routes = root_routes.dup
-      drawn_nested_routes = nested_routes.dup
-
-      router.instance_exec(drawn_root_routes, drawn_nested_routes) do |rr, nr|
-        rr.each do |route|
-          children = nr[route[:name]]
-          if children&.any?
-            resources route[:name] do
-              children.each { |child| resources child[:name], module: child[:module] }
-            end
-          else
-            resources route[:name]
-          end
-        end
-      end
-    end
-  end
 
   helper_method :resource, :resources, :permitted_attributes
 
@@ -116,71 +55,8 @@ class AutoController < ApplicationController
   end
 
   private
-
-  def resource_scope
-    return model.all unless scope
-
-    result = instance_exec(&scope)
-    case result
-    when ActiveRecord::Relation
-      result
-    when ApplicationRecord
-      result.public_send(model.model_name.plural)
-    when Class
-      parent_record ? parent_record.public_send(model.model_name.plural) : model.all
-    else
-      model.all
-    end
-  end
-
-  def parent_record
-    return unless scope
-
-    result = instance_exec(&scope)
-    return unless result.is_a?(Class) && result < ApplicationRecord
-
-    parent_id = params[:"#{result.model_name.param_key}_id"]
-    @parent_record ||= result.find(parent_id) if parent_id
-  end
-
-  def after_save_url
-    case self.class.after_save_redirect_to
-    when :index
-      url_for(action: :index)
-    when :parent
-      parent_record
-    else
-      url_for(action: :show, id: resource)
-    end
-  end
-
-  def permitted_attributes
-    if permit
-      permit
-    else
-      attrs = model.column_names.map(&:to_sym) - [:id, :created_at, :updated_at]
-      belongs_to_keys = model.reflect_on_all_associations(:belongs_to).map { |a| a.foreign_key.to_sym }
-      attrs | belongs_to_keys
-    end
-  end
-
+  
   def resource_params
     params.require(model.model_name.param_key).permit(permitted_attributes)
-  end
-
-  def resource
-    instance_variable_get(:"@#{model.model_name.singular}")
-  end
-
-  def resource=(value)
-    instance_variable_set(:"@#{model.model_name.singular}", value)
-  end
-
-  def resources
-    instance_variable_get(:"@#{model.model_name.plural}")
-  end
-
-  def resources=(value)
-    instance_variable_set(:"@#{model.model_name.plural}", value)
   end
 end
