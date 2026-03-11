@@ -75,37 +75,7 @@
     </div>
 
     <% has_many_assocs.each_with_index do |assoc, i| %>
-      <div id="tab-<%= assoc.name %>" data-tab-panel class="<%= 'hidden' unless i == 0 %>">
-        <% child_controller = "#{assoc.name.to_s.camelize}Controller".safe_constantize %>
-        <% child_attrs = (child_controller&.permit || assoc.klass.column_names.map(&:to_sym) - [:id, :created_at, :updated_at]) %>
-        <% back_refs = assoc.klass.reflect_on_all_associations(:belongs_to).select { |bt|
-          if bt.polymorphic?
-            assoc.options[:as] && bt.name == assoc.options[:as]
-          else
-            bt.klass == controller.model
-          end
-        } %>
-        <% back_ref_cols = back_refs.flat_map { |bt| bt.polymorphic? ? [bt.foreign_key.to_sym, :"#{bt.name}_type"] : [bt.foreign_key.to_sym] }.to_set %>
-        <% child_attrs = child_attrs.reject { |a| back_ref_cols.include?(a) } %>
-        <% collection_partial = "#{assoc.klass.model_name.collection}/#{assoc.klass.model_name.singular}" %>
-        <% new_path = polymorphic_url([:new, resource, assoc.klass.model_name.singular.to_sym]) rescue nil %>
-        <div class="flex items-center justify-between mb-3">
-          <span class="font-bold text-lg"><%= assoc.klass.model_name.human.pluralize %></span>
-          <% if authenticated? && new_path %>
-            <%= link_to new_path, class: "btn btn-primary btn-sm" do %>
-              <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path clip-rule="evenodd" fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
-              </svg>
-              New <%= assoc.klass.model_name.human.downcase %>
-            <% end %>
-          <% end %>
-        </div>
-        <% if lookup_context.exists?(collection_partial, [], true) %>
-          <%= render partial: collection_partial, collection: resource.public_send(assoc.name) %>
-        <% else %>
-          <%= render "table", model: assoc.klass, records: resource.public_send(assoc.name), attrs: child_attrs %>
-        <% end %>
-      </div>
+      <%= render "child_tab", assoc: assoc, first: i == 0 %>
     <% end %>
   <% end %>
 </div>
