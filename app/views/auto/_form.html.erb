@@ -4,7 +4,7 @@
     <div role="alert" class="alert alert-error mt-3">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
       <div>
-        <h2><%= pluralize(resource.errors.count, "error") %> prohibited this <%= controller.model.model_name.human.downcase %> from being saved:</h2>
+        <h2><%= pluralize(resource.errors.count, "error") %> prohibited this <%= controller_model.model_name.human.downcase %> from being saved:</h2>
         <ul class="list-disc ml-5 mt-2">
           <% resource.errors.each do |error| %>
             <li><%= error.full_message %></li>
@@ -14,11 +14,11 @@
     </div>
   <% end %>
 
-  <% belongs_to_keys = controller.model.reflect_on_all_associations(:belongs_to).reject(&:polymorphic?).index_by { |a| a.foreign_key.to_sym } %>
-  <% polymorphic_type_cols = controller.model.reflect_on_all_associations(:belongs_to).select(&:polymorphic?).map { |a| :"#{a.name}_type" }.to_set %>
-  <% polymorphic_id_cols = controller.model.reflect_on_all_associations(:belongs_to).select(&:polymorphic?).map { |a| a.foreign_key.to_sym }.to_set %>
+  <% belongs_to_keys = controller_model.reflect_on_all_associations(:belongs_to).reject(&:polymorphic?).index_by { |a| a.foreign_key.to_sym } %>
+  <% polymorphic_type_cols = controller_model.reflect_on_all_associations(:belongs_to).select(&:polymorphic?).map { |a| :"#{a.name}_type" }.to_set %>
+  <% polymorphic_id_cols = controller_model.reflect_on_all_associations(:belongs_to).select(&:polymorphic?).map { |a| a.foreign_key.to_sym }.to_set %>
   <% permitted_attributes.reject { |a| polymorphic_type_cols.include?(a) || polymorphic_id_cols.include?(a) }.each do |attr| %>
-    <% column = controller.model.columns_hash[attr.to_s] %>
+    <% column = controller_model.columns_hash[attr.to_s] %>
     <% assoc = belongs_to_keys[attr] %>
     <div class="my-5">
       <% if assoc %>
@@ -26,7 +26,7 @@
         <% new_url = url_for(controller: "/#{assoc.klass.model_name.route_key}", action: :new, inline: 1) rescue nil %>
         <div <%= "data-controller=nested-new data-nested-new-url-value=#{new_url}" if new_url %>>
           <fieldset class="fieldset">
-            <legend class="fieldset-legend"><%= controller.model.human_attribute_name(assoc.name) %></legend>
+            <legend class="fieldset-legend"><%= controller_model.human_attribute_name(assoc.name) %></legend>
             <div class="flex gap-2">
               <%= form.collection_select assoc.foreign_key, assoc.klass.all, :id, display_method, { prompt: "Select #{assoc.klass.model_name.human.downcase}" }, class: "select w-full", data: { nested_new_target: "select" } %>
               <% if new_url %>
@@ -50,7 +50,7 @@
         </div>
       <% else %>
         <fieldset class="fieldset">
-          <legend class="fieldset-legend"><%= controller.model.human_attribute_name(attr) %></legend>
+          <legend class="fieldset-legend"><%= controller_model.human_attribute_name(attr) %></legend>
           <% case column&.type %>
           <% when :text %>
             <%= form.text_area attr, rows: 8, class: "textarea w-full" %>

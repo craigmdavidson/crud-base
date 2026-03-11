@@ -5,17 +5,16 @@
         <path clip-rule="evenodd" fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"></path>
       </svg>
     </button>
+    
+    
     <%= link_to root_path, class: "btn btn-ghost text-xl" do %>
-      MyApp
+      <%= render "layouts/navbar_logo" %>
     <% end %>
   </div>
 
   <div class="navbar-end">
     <ul class="menu menu-horizontal px-1 items-center gap-1">
       <% if authenticated? %>
-        <li>
-          <%= link_to "Messages (#{Current.user.messages.count})", messages_path %>
-        </li>
         <li>
           <%= button_to session_path, method: :delete, class: "flex items-center gap-2" do %>
             <%= avatar_for(Current.user) %>
@@ -29,6 +28,7 @@
       <% end %>
     </ul>
 
+    <!--
     <div data-controller="theme" class="dropdown dropdown-end">
       <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -41,5 +41,6 @@
         <li><button data-action="theme#switch" data-theme="terminal">Terminal</button></li>
       </ul>
     </div>
+    -->  
   </div>
 </header>

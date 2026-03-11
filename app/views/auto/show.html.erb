@@ -18,15 +18,15 @@
       <% end %>
     </div>
   </div>
-  <h1 class="font-bold text-2xl mb-4"><%= controller.model.model_name.human %></h1>
+  <h1 class="font-bold text-2xl mb-4"><%= controller_model.model_name.human %></h1>
 
-  <% belongs_to_keys = controller.model.reflect_on_all_associations(:belongs_to).reject(&:polymorphic?).index_by { |a| a.foreign_key.to_sym } %>
-  <% polymorphic_keys = controller.model.reflect_on_all_associations(:belongs_to).select(&:polymorphic?).index_by { |a| a.foreign_key.to_sym } %>
+  <% belongs_to_keys = controller_model.reflect_on_all_associations(:belongs_to).reject(&:polymorphic?).index_by { |a| a.foreign_key.to_sym } %>
+  <% polymorphic_keys = controller_model.reflect_on_all_associations(:belongs_to).select(&:polymorphic?).index_by { |a| a.foreign_key.to_sym } %>
   <% polymorphic_type_cols = polymorphic_keys.values.map { |a| :"#{a.name}_type" }.to_set %>
   <% permitted_attributes.reject { |a| polymorphic_type_cols.include?(a) }.each do |attr| %>
     <% assoc = belongs_to_keys[attr] %>
     <% poly_assoc = polymorphic_keys[attr] %>
-    <% column = controller.model.columns_hash[attr.to_s] %>
+    <% column = controller_model.columns_hash[attr.to_s] %>
     <div class="my-5">
       <% if assoc %>
         <% related = resource.public_send(assoc.name) %>
@@ -47,7 +47,7 @@
           <p class="mt-1 text-sm text-base-content/50 italic">None</p>
         <% end %>
       <% else %>
-        <h2 class="text-sm font-semibold text-base-content/60 uppercase tracking-wide"><%= controller.model.human_attribute_name(attr) %></h2>
+        <h2 class="text-sm font-semibold text-base-content/60 uppercase tracking-wide"><%= controller_model.human_attribute_name(attr) %></h2>
         <% value = resource.public_send(attr) %>
         <% if column&.type == :text %>
           <div class="mt-1 text-sm whitespace-pre-wrap"><%= value %></div>
@@ -58,7 +58,7 @@
     </div>
   <% end %>
 
-  <% has_many_assocs = controller.model.reflect_on_all_associations(:has_many) %>
+  <% has_many_assocs = controller_model.reflect_on_all_associations(:has_many) %>
   <% if has_many_assocs.any? %>
     <div class="divider my-8"></div>
 

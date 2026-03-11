@@ -5,7 +5,7 @@
     if bt.polymorphic?
       assoc.options[:as] && bt.name == assoc.options[:as]
     else
-      bt.klass == controller.model
+      bt.klass == controller_model
     end
   } %>
   <% back_ref_cols = back_refs.flat_map { |bt| bt.polymorphic? ? [bt.foreign_key.to_sym, :"#{bt.name}_type"] : [bt.foreign_key.to_sym] }.to_set %>
