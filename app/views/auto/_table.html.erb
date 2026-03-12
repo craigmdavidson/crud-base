@@ -24,22 +24,31 @@
             <% visible_attrs.each_with_index do |attr, i| %>
               <% assoc = belongs_to_keys[attr] %>
               <% poly_assoc = polymorphic_keys[attr] %>
+              <% value = record.public_send(attr) %>
               <% if i == 0 %>
-                <th class="font-medium"><%= record.public_send(attr) %></th>
+                <th class="font-medium"><%= value.present? ? value : raw("&mdash;") %></th>
               <% elsif assoc %>
                 <% related = record.public_send(assoc.name) %>
-                <% display_method = %i[name title label].detect { |m| assoc.klass.method_defined?(m) || assoc.klass.column_names.include?(m.to_s) } || :id %>
-                <td><%= related&.public_send(display_method) %></td>
+                <% if related %>
+                  <% display_method = %i[name title label].detect { |m| assoc.klass.method_defined?(m) || assoc.klass.column_names.include?(m.to_s) } || :id %>
+                  <td><%= related.public_send(display_method) %></td>
+                <% else %>
+                  <td class="text-base-content/50">&mdash;</td>
+                <% end %>
               <% elsif poly_assoc %>
                 <% related = record.public_send(poly_assoc.name) %>
                 <% if related %>
                   <% display_method = %i[name title label].detect { |m| related.class.method_defined?(m) || related.class.column_names.include?(m.to_s) } || :id %>
                   <td><%= link_to related.public_send(display_method), polymorphic_path(related), class: "link", onclick: "event.stopPropagation()" %></td>
                 <% else %>
-                  <td class="text-base-content/50 italic">None</td>
+                  <td class="text-base-content/50">&mdash;</td>
                 <% end %>
               <% else %>
-                <td><%= truncate(record.public_send(attr).to_s, length: 100) %></td>
+                <% if value.present? %>
+                  <td><%= truncate(value.to_s, length: 100) %></td>
+                <% else %>
+                  <td class="text-base-content/50">&mdash;</td>
+                <% end %>
               <% end %>
             <% end %>
           </tr>
