@@ -1,0 +1,42 @@
+<% attrs = local_assigns.fetch(:attrs, permitted_attributes) %>
+<% cols = local_assigns.fetch(:cols, 1) %>
+<% belongs_to_keys = controller_model.reflect_on_all_associations(:belongs_to).reject(&:polymorphic?).index_by { |a| a.foreign_key.to_sym } %>
+<% polymorphic_keys = controller_model.reflect_on_all_associations(:belongs_to).select(&:polymorphic?).index_by { |a| a.foreign_key.to_sym } %>
+<% polymorphic_type_cols = polymorphic_keys.values.map { |a| :"#{a.name}_type" }.to_set %>
+<% visible_attrs = attrs.reject { |a| polymorphic_type_cols.include?(a) } %>
+<div class="grid grid-cols-1 sm:grid-cols-<%= cols %> gap-x-6 gap-y-4">
+  <% visible_attrs.each do |attr| %>
+    <% assoc = belongs_to_keys[attr] %>
+    <% poly_assoc = polymorphic_keys[attr] %>
+    <% column = controller_model.columns_hash[attr.to_s] %>
+    <div>
+      <% if assoc %>
+        <% related = resource.public_send(assoc.name) %>
+        <h2 class="text-sm font-semibold text-base-content/60 uppercase tracking-wide"><%= assoc.klass.model_name.human %></h2>
+        <% if related %>
+          <% display_method = %i[name title label].detect { |m| assoc.klass.method_defined?(m) || assoc.klass.column_names.include?(m.to_s) } || :id %>
+          <p class="mt-1 text-sm"><%= link_to related.public_send(display_method), related, class: "link" %></p>
+        <% else %>
+          <p class="mt-1 text-sm text-base-content/50 italic">None</p>
+        <% end %>
+      <% elsif poly_assoc %>
+        <% related = resource.public_send(poly_assoc.name) %>
+        <h2 class="text-sm font-semibold text-base-content/60 uppercase tracking-wide"><%= poly_assoc.name.to_s.humanize %></h2>
+        <% if related %>
+          <% display_method = %i[name title label].detect { |m| related.class.method_defined?(m) || related.class.column_names.include?(m.to_s) } || :id %>
+          <p class="mt-1 text-sm"><%= link_to related.public_send(display_method), related, class: "link" %></p>
+        <% else %>
+          <p class="mt-1 text-sm text-base-content/50 italic">None</p>
+        <% end %>
+      <% else %>
+        <h2 class="text-sm font-semibold text-base-content/60 uppercase tracking-wide"><%= controller_model.human_attribute_name(attr) %></h2>
+        <% value = resource.public_send(attr) %>
+        <% if column&.type == :text %>
+          <div class="mt-1 text-sm whitespace-pre-wrap"><%= value %></div>
+        <% else %>
+          <p class="mt-1 text-sm"><%= value %></p>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
