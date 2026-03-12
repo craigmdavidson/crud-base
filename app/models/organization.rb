@@ -5,6 +5,6 @@ class Organization < ApplicationRecord
   has_many :funds, dependent: :destroy
   has_many :messages, as: :messagable, dependent: :destroy
   
-
-  has_auto_controller key_attributes: [:name, :code, :address_id]
+  has_auto_controller key_attributes: [:name, :code, :address_id], 
+    sidebar: { icon: "building-office" }
 end

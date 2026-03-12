@@ -3,7 +3,9 @@ class Person < ApplicationRecord
   belongs_to :organization, optional: true
   has_many :messages, as: :messagable, dependent: :destroy  
 
-  has_auto_controller after_save_redirect_to: :index, key_attributes: [:full_name, :email, :telephone, :organization_id]
+  has_auto_controller after_save_redirect_to: :index, 
+    key_attributes: [:full_name, :email, :telephone, :organization_id],
+    sidebar: { icon: "users" }
 
   has_nested_auto_controller Organization,
     permit: [:title, :first_name, :last_name, :email, :telephone],

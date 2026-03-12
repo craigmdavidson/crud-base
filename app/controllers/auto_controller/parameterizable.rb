@@ -10,6 +10,7 @@ class AutoController
       class_attribute :permit, instance_writer: false, default: []
       class_attribute :after_save_redirect_to, instance_writer: false, default: :show
       class_attribute :key_attributes, instance_writer: false, default: []
+      class_attribute :sidebar_icon, instance_writer: false
     end
 
     class_methods do
@@ -22,7 +23,11 @@ class AutoController
       end
 
       def sidebar=(value)
-        if value
+        case value
+        when Hash
+          self.sidebar_icon = value[:icon]
+          sidebar_controllers << self unless sidebar_controllers.include?(self)
+        when true
           sidebar_controllers << self unless sidebar_controllers.include?(self)
         else
           sidebar_controllers.delete(self)
