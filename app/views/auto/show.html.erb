@@ -14,7 +14,7 @@
     <div class="flex items-center gap-2">
       <% if authenticated? %>
         <%= link_to "Edit", url_for(action: :edit, id: resource), class: "btn btn-primary btn-sm rounded-2xl" %>
-        <%= button_to "Delete", url_for(action: :destroy, id: resource), method: :delete, class: "btn btn-error btn-sm rounded-2xl", data: { turbo_confirm: "Are you sure?" } %>
+        <%= button_to "Delete", url_for(action: :destroy, id: resource), method: :delete, class: "btn btn-outline btn-error btn-sm rounded-2xl", data: { turbo_confirm: "Are you sure?" } %>
       <% end %>
     </div>
   </div>

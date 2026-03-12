@@ -13,34 +13,30 @@
   </div>
 
   <div class="navbar-end">
-    <ul class="menu menu-horizontal px-1 items-center gap-1">
-      <% if authenticated? %>
-        <li>
-          <%= button_to session_path, method: :delete, class: "flex items-center gap-2" do %>
-            <%= avatar_for(Current.user) %>
-            <span>Sign out</span>
-          <% end %>
-        </li>
-      <% else %>
-        <li>
-          <%= link_to "Sign in", new_session_path %>
-        </li>
-      <% end %>
-    </ul>
-
-    <!--
-    <div data-controller="theme" class="dropdown dropdown-end">
-      <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
-        </svg>
+    <% if authenticated? %>
+      <div class="dropdown dropdown-end">
+        <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+          <%= avatar_for(Current.user) %>
+        </div>
+        <div tabindex="0" class="dropdown-content bg-base-100 border border-base-content/12 rounded-xl shadow-lg w-56 mt-2 z-50">
+          <div class="px-4 py-3 border-b border-base-content/12">
+            <% if Current.user.name.present? %>
+              <span class="block text-sm font-medium"><%= Current.user.name %></span>
+            <% end %>
+            <span class="block text-sm text-base-content/60 truncate"><%= Current.user.email_address %></span>
+          </div>
+          <ul class="menu menu-sm p-2">
+            <li>
+              <%= button_to session_path, method: :delete, class: "flex items-center gap-2" do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3-3h-9m0 0l3-3m-3 3l3 3" /></svg>
+                Sign out
+              <% end %>
+            </li>
+          </ul>
+        </div>
       </div>
-      <ul tabindex="-1" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-36 p-2 shadow">
-        <li><button data-action="theme#switch" data-theme="light">Light</button></li>
-        <li><button data-action="theme#switch" data-theme="dark">Dark</button></li>
-        <li><button data-action="theme#switch" data-theme="terminal">Terminal</button></li>
-      </ul>
-    </div>
-    -->  
+    <% else %>
+      <%= link_to "Sign in", new_session_path, class: "btn btn-ghost btn-sm rounded-2xl" %>
+    <% end %>
   </div>
 </header>

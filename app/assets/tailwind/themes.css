@@ -9,8 +9,8 @@
   --color-base-200: oklch(.968 .007 247.896);  /* slate-100 */
   --color-base-300: oklch(.929 .013 255.508);  /* slate-200 */
   --color-base-content: oklch(.208 .042 265.755);  /* slate-900 */
-  /* Blue primary */
-  --color-primary: oklch(.546 .245 262.881);  /* blue-600 */
+  /* Black primary */
+  --color-primary: oklch(.145 .014 265.755);  /* slate-950 */
   --color-primary-content: oklch(100% 0 0);
   --color-secondary: oklch(.707 .165 254.624);  /* blue-400 */
   --color-secondary-content: oklch(100% 0 0);
