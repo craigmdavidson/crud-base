@@ -22,7 +22,7 @@
     </div>
   </div>
   <% if resource.respond_to?(:name) && resource.name.present? %>
-    <h2 class="text-sm font-semibold text-base-content/60 uppercase tracking-wide"><%= controller_model.model_name.human %></h2>
+    <h2 class="text-xs font-normal text-base-content/60 uppercase tracking-wide"><%= controller_model.model_name.human %></h2>
     <h1 class="font-bold text-2xl mb-6"><%= resource.name %></h1>
   <% else %>
     <h1 class="font-bold text-2xl mb-6"><%= controller_model.model_name.human %></h1>
@@ -59,7 +59,7 @@
       </div>
 
       <% if has_details_tab %>
-        <div id="tab-details" data-tabs-target="panel" class="hidden">
+        <div id="tab-details" data-tabs-target="panel" class="hidden pt-8">
           <%= render "details", cols: 2 %>
         </div>
       <% end %>
