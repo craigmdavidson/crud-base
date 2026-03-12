@@ -3,7 +3,7 @@ class AutoController < ApplicationController
   
   layout "auto"
 
-  helper_method :resource, :resources, :permitted_attributes
+  helper_method :resource, :resources, :permitted_attributes, :table_attributes
 
   def index
     self.resources = resource_scope.all

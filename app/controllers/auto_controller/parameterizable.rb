@@ -9,6 +9,7 @@ class AutoController
       class_attribute :scope, instance_writer: false
       class_attribute :permit, instance_writer: false, default: []
       class_attribute :after_save_redirect_to, instance_writer: false, default: :show
+      class_attribute :key_attributes, instance_writer: false, default: []
     end
 
     class_methods do
@@ -50,6 +51,10 @@ class AutoController
         belongs_to_keys = model.reflect_on_all_associations(:belongs_to).map { |a| a.foreign_key.to_sym }
         attrs | belongs_to_keys
       end
+    end
+
+    def table_attributes
+      key_attributes.present? ? key_attributes : permitted_attributes
     end
   end
 end

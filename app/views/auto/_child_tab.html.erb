@@ -1,6 +1,7 @@
 <div id="tab-<%= assoc.name %>" data-tab-panel class="<%= 'hidden' unless first %>">
-  <% child_controller = "#{assoc.name.to_s.camelize}Controller".safe_constantize %>
-  <% child_attrs = (child_controller&.permit || assoc.klass.column_names.map(&:to_sym) - [:id, :created_at, :updated_at]) %>
+  <% child_controller = "#{controller_model.model_name.plural.camelize}::#{assoc.name.to_s.camelize}Controller".safe_constantize ||
+                         "#{assoc.name.to_s.camelize}Controller".safe_constantize %>
+  <% child_attrs = (child_controller&.key_attributes.presence || child_controller&.permit.presence || assoc.klass.column_names.map(&:to_sym) - [:id, :created_at, :updated_at]) %>
   <% back_refs = assoc.klass.reflect_on_all_associations(:belongs_to).select { |bt|
     if bt.polymorphic?
       assoc.options[:as] && bt.name == assoc.options[:as]
