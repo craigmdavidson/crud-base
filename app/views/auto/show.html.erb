@@ -7,14 +7,14 @@
   <% end %>
 
   <div class="flex items-center justify-between mb-4">
-    <%= link_to url_for(action: :index), class: "btn btn-ghost btn-sm" do %>
+    <%= link_to url_for(action: :index), class: "btn btn-ghost btn-sm rounded-2xl" do %>
       <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
       Back
     <% end %>
     <div class="flex items-center gap-2">
       <% if authenticated? %>
-        <%= link_to "Edit", url_for(action: :edit, id: resource), class: "btn btn-primary btn-sm" %>
-        <%= button_to "Delete", url_for(action: :destroy, id: resource), method: :delete, class: "btn btn-error btn-sm", data: { turbo_confirm: "Are you sure?" } %>
+        <%= link_to "Edit", url_for(action: :edit, id: resource), class: "btn btn-primary btn-sm rounded-2xl" %>
+        <%= button_to "Delete", url_for(action: :destroy, id: resource), method: :delete, class: "btn btn-error btn-sm rounded-2xl", data: { turbo_confirm: "Are you sure?" } %>
       <% end %>
     </div>
   </div>
