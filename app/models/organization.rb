@@ -6,5 +6,5 @@ class Organization < ApplicationRecord
   has_many :messages, as: :messagable, dependent: :destroy
   
 
-  has_auto_controller key_attributes: [:name, :code, :legal_name, :trading_name, :address_id]
+  has_auto_controller key_attributes: [:name, :code, :address_id]
 end
