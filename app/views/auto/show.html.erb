@@ -13,12 +13,20 @@
     <% end %>
     <div class="flex items-center gap-2">
       <% if authenticated? %>
-        <%= link_to "Edit", url_for(action: :edit, id: resource), class: "btn btn-primary btn-sm rounded-2xl" %>
+        <%= link_to url_for(action: :edit, id: resource), class: "btn btn-primary btn-sm rounded-2xl" do %>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg>
+          Edit
+        <% end %>
         <%= button_to "Delete", url_for(action: :destroy, id: resource), method: :delete, class: "btn btn-outline btn-error btn-sm rounded-2xl", data: { turbo_confirm: "Are you sure?" } %>
       <% end %>
     </div>
   </div>
-  <h1 class="font-bold text-2xl mb-4"><%= controller_model.model_name.human %></h1>
+  <% if resource.respond_to?(:name) && resource.name.present? %>
+    <h2 class="text-sm font-semibold text-base-content/60 uppercase tracking-wide"><%= controller_model.model_name.human %></h2>
+    <h1 class="font-bold text-2xl mb-6"><%= resource.name %></h1>
+  <% else %>
+    <h1 class="font-bold text-2xl mb-6"><%= controller_model.model_name.human %></h1>
+  <% end %>
 
   <% belongs_to_keys = controller_model.reflect_on_all_associations(:belongs_to).reject(&:polymorphic?).index_by { |a| a.foreign_key.to_sym } %>
   <% polymorphic_keys = controller_model.reflect_on_all_associations(:belongs_to).select(&:polymorphic?).index_by { |a| a.foreign_key.to_sym } %>

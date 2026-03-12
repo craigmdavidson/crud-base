@@ -8,6 +8,11 @@
       <%= button_to "Delete", url_for(action: :destroy, id: resource), method: :delete, class: "btn btn-outline btn-error btn-sm rounded-2xl", data: { turbo_confirm: "Are you sure?" } %>
     <% end %>
   </div>
-  <h1 class="font-bold text-2xl mb-4">Edit <%= controller_model.model_name.human.downcase %></h1>
+  <% if resource.respond_to?(:name) && resource.name.present? %>
+    <h2 class="text-sm font-semibold text-base-content/60 uppercase tracking-wide">Edit <%= controller_model.model_name.human %></h2>
+    <h1 class="font-bold text-2xl mb-6"><%= resource.name %></h1>
+  <% else %>
+    <h1 class="font-bold text-2xl mb-6">Edit <%= controller_model.model_name.human.downcase %></h1>
+  <% end %>
   <%= render "form", resource: resource %>
 </div>
