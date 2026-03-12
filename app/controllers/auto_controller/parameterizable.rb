@@ -37,7 +37,7 @@ class AutoController
       when :index
         url_for(action: :index)
       when :parent
-        parent_record
+        polymorphic_path(parent_record, tab: model.model_name.route_key)
       else
         url_for(action: :show, id: resource)
       end

@@ -1,4 +1,4 @@
-<div id="tab-<%= assoc.name %>" data-tab-panel class="<%= 'hidden' unless first %>">
+<div id="tab-<%= assoc.name %>" data-tabs-target="panel" class="hidden">
   <% child_controller = "#{controller_model.model_name.plural.camelize}::#{assoc.name.to_s.camelize}Controller".safe_constantize ||
                          "#{assoc.name.to_s.camelize}Controller".safe_constantize %>
   <% child_attrs = (child_controller&.key_attributes.presence || child_controller&.permit.presence || assoc.klass.column_names.map(&:to_sym) - [:id, :created_at, :updated_at]) %>
