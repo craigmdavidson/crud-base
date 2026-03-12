@@ -31,10 +31,14 @@
       <% else %>
         <h2 class="text-xs font-normal text-base-content/60 uppercase tracking-wide"><%= controller_model.human_attribute_name(attr) %></h2>
         <% value = resource.public_send(attr) %>
-        <% if column&.type == :text %>
-          <div class="mt-1 text-sm font-semibold whitespace-pre-wrap"><%= value %></div>
+        <% if value.present? %>
+          <% if column&.type == :text %>
+            <div class="mt-1 text-sm font-semibold whitespace-pre-wrap"><%= value %></div>
+          <% else %>
+            <p class="mt-1 text-sm font-semibold"><%= value %></p>
+          <% end %>
         <% else %>
-          <p class="mt-1 text-sm font-semibold"><%= value %></p>
+          <p class="mt-1 text-sm text-base-content/50">&mdash;</p>
         <% end %>
       <% end %>
     </div>
