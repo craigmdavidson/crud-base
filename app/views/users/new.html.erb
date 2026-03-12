@@ -1,0 +1,41 @@
+<div class="grid h-screen place-items-center bg-gray-50">
+  <div class="w-full max-w-sm border border-gray-200 bg-white shadow-sm rounded-lg p-8">
+    <% if alert = flash[:alert] %>
+      <p class="text-red-600 font-light italic text-sm mb-4" id="alert"><%= alert %></p>
+    <% end %>
+
+    <% if @user.errors.any? %>
+      <div class="text-red-600 font-light italic text-sm mb-4" id="errors">
+        <% @user.errors.full_messages.each do |message| %>
+          <p><%= message %></p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Register</h1>
+
+    <%= form_with model: @user, url: user_url, class: "space-y-4" do |form| %>
+      <div class="fieldset">
+        <%= form.label :email_address, "Email", class: "block mb-1 text-sm font-medium text-gray-700" %>
+        <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", class: "w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" %>
+      </div>
+
+      <div class="fieldset">
+        <%= form.label :password, "Password", class: "block mb-1 text-sm font-medium text-gray-700" %>
+        <%= form.password_field :password, required: true, autocomplete: "new-password", maxlength: 72, class: "w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" %>
+      </div>
+
+      <div class="fieldset">
+        <%= form.label :password_confirmation, "Confirm password", class: "block mb-1 text-sm font-medium text-gray-700" %>
+        <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", maxlength: 72, class: "w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" %>
+      </div>
+
+      <div class="flex justify-between items-center text-sm pt-4">
+        <%= link_to "Forgot your password?", new_password_path, class: "text-blue-600 hover:underline" %>
+        <%= link_to "Already have an account?", new_session_path, class: "text-blue-600 hover:underline" %>
+      </div>
+
+      <%= form.submit "Create account", class: "w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer mt-2" %>
+    <% end %>
+  </div>
+</div>
