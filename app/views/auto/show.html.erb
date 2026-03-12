@@ -38,9 +38,7 @@
   <% end %>
 
   <% if has_many_assocs.any? || has_details_tab %>
-    <div class="divider my-8"></div>
-
-    <div data-controller="tabs">
+    <div class="mt-8" data-controller="tabs">
       <div class="border-b border-base-300 mb-4">
         <div class="flex flex-wrap gap-1 -mb-px">
           <% if has_details_tab %>
