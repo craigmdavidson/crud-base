@@ -4,6 +4,7 @@
 <% polymorphic_keys = controller_model.reflect_on_all_associations(:belongs_to).select(&:polymorphic?).index_by { |a| a.foreign_key.to_sym } %>
 <% polymorphic_type_cols = polymorphic_keys.values.map { |a| :"#{a.name}_type" }.to_set %>
 <% visible_attrs = attrs.reject { |a| polymorphic_type_cols.include?(a) } %>
+<div class="bg-base-100 rounded-box pt-6 px-5 pb-5 shadow-[0_2px_8px_0_rgba(0,0,0,0.04)]">
 <div class="grid grid-cols-1 sm:grid-cols-[repeat(var(--cols),minmax(0,1fr))] gap-x-6 gap-y-8" style="--cols: <%= cols %>">
   <% visible_attrs.each do |attr| %>
     <% assoc = belongs_to_keys[attr] %>
@@ -43,4 +44,5 @@
       <% end %>
     </div>
   <% end %>
+</div>
 </div>
