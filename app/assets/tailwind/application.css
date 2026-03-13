@@ -5,6 +5,10 @@
   themes: corporate, business;
 }
 
+.panel {
+  @apply bg-base-100 rounded-box pt-6 px-5 pb-5 shadow-[0_2px_8px_0_rgba(0,0,0,0.04)];
+}
+
 /* Links: dark slate tone with thin underline, thicker on hover */
 .link {
   color: var(--color-base-content);
