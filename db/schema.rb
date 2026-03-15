@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_10_153350) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_15_105618) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,12 +40,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_10_153350) do
     t.string "code"
     t.date "start_date"
     t.date "end_date"
-    t.decimal "total_fund", precision: 10, scale: 2
-    t.decimal "research_allocation", precision: 10, scale: 2
-    t.decimal "operations_expense_allocation", precision: 10, scale: 2
-    t.decimal "program_delivery_allocation", precision: 10, scale: 2
+    t.decimal "total_fund_amount", precision: 10, scale: 2
+    t.decimal "research_allocation_amount", precision: 10, scale: 2
+    t.decimal "operations_expense_allocation_amount", precision: 10, scale: 2
+    t.decimal "program_delivery_allocation_amount", precision: 10, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "total_fund_currency", default: "USD"
+    t.string "research_allocation_currency", default: "USD"
+    t.string "operations_expense_allocation_currency", default: "USD"
+    t.string "program_delivery_allocation_currency", default: "USD"
     t.index ["organization_id"], name: "index_funds_on_organization_id"
   end
 
