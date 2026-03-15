@@ -34,9 +34,9 @@ class AutoController
         end
       end
     end
-    
+
     private
-    
+
     def after_save_url
       case self.class.after_save_redirect_to
       when :index
@@ -47,13 +47,20 @@ class AutoController
         url_for(action: :show, id: resource)
       end
     end
-    
+
     def permitted_attributes
       if permit
         permit
       else
-        attrs = model.column_names.map(&:to_sym) - [:id, :created_at, :updated_at]
+        attrs = model.column_names.map(&:to_sym) - [ :id, :created_at, :updated_at ]
         belongs_to_keys = model.reflect_on_all_associations(:belongs_to).map { |a| a.foreign_key.to_sym }
+
+        model.reflect_on_all_aggregations.each do |aggregation|
+          mapped_columns = aggregation.mapping.map { |col, _| col.to_sym }
+          attrs -= mapped_columns
+          attrs << aggregation.name
+        end
+
         attrs | belongs_to_keys
       end
     end
