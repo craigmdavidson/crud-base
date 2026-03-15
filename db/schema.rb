@@ -40,16 +40,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_15_105618) do
     t.string "code"
     t.date "start_date"
     t.date "end_date"
-    t.decimal "total_fund_amount", precision: 10, scale: 2
-    t.decimal "research_allocation_amount", precision: 10, scale: 2
-    t.decimal "operations_expense_allocation_amount", precision: 10, scale: 2
-    t.decimal "program_delivery_allocation_amount", precision: 10, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "total_fund_currency", default: "USD"
-    t.string "research_allocation_currency", default: "USD"
-    t.string "operations_expense_allocation_currency", default: "USD"
-    t.string "program_delivery_allocation_currency", default: "USD"
+    t.money "total_fund", scale: 2
+    t.money "research_allocation", scale: 2
+    t.money "operations_expense_allocation", scale: 2
+    t.money "program_delivery_allocation", scale: 2
     t.index ["organization_id"], name: "index_funds_on_organization_id"
   end
 

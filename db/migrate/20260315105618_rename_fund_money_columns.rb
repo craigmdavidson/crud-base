@@ -1,13 +1,15 @@
 class RenameFundMoneyColumns < ActiveRecord::Migration[8.0]
   def change
-    rename_column :funds, :total_fund, :total_fund_amount
-    rename_column :funds, :research_allocation, :research_allocation_amount
-    rename_column :funds, :operations_expense_allocation, :operations_expense_allocation_amount
-    rename_column :funds, :program_delivery_allocation, :program_delivery_allocation_amount
+    change_table :funds do |t|
+      t.remove :total_fund, type: :decimal, precision: 10, scale: 2
+      t.remove :research_allocation, type: :decimal, precision: 10, scale: 2
+      t.remove :operations_expense_allocation, type: :decimal, precision: 10, scale: 2
+      t.remove :program_delivery_allocation, type: :decimal, precision: 10, scale: 2
 
-    add_column :funds, :total_fund_currency, :string, default: "USD"
-    add_column :funds, :research_allocation_currency, :string, default: "USD"
-    add_column :funds, :operations_expense_allocation_currency, :string, default: "USD"
-    add_column :funds, :program_delivery_allocation_currency, :string, default: "USD"
+      t.money :total_fund
+      t.money :research_allocation
+      t.money :operations_expense_allocation
+      t.money :program_delivery_allocation
+    end
   end
 end
