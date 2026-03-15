@@ -49,23 +49,7 @@
           <% end %>
         </div>
       <% else %>
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend"><%= controller_model.human_attribute_name(attr) %></legend>
-          <% case column&.type %>
-          <% when :text %>
-            <%= form.text_area attr, rows: 8, class: "textarea w-full" %>
-          <% when :boolean %>
-            <%= form.check_box attr, class: "checkbox checkbox-primary" %>
-          <% when :integer, :float, :decimal %>
-            <%= form.number_field attr, class: "input w-full" %>
-          <% when :date %>
-            <%= form.date_field attr, class: "input w-full" %>
-          <% when :datetime %>
-            <%= form.datetime_local_field attr, class: "input w-full" %>
-          <% else %>
-            <%= form.text_field attr, class: "input w-full" %>
-          <% end %>
-        </fieldset>
+        <%= auto_field(form, attr) %>
       <% end %>
     </div>
   <% end %>
