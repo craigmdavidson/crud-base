@@ -1,6 +1,6 @@
 require "test_helper"
 
-class MoneyParserTest < ActiveSupport::TestCase
+class Money::ParserTest < ActiveSupport::TestCase
   test "parses" do
     assert_equal Money.new(100_000, "USD"), Money::Parser.parse("100000")
     assert_equal Money.new(100_000, "USD"), Money::Parser.parse("100,000")

@@ -1,7 +1,7 @@
 module MoneyColumn
   def money(name, precision: 10, scale: 2, **options)
     decimal :"#{name}_amount", precision: precision, scale: scale, **options
-    string :"#{name}_currency", default: "USD"
+    string :"#{name}_currency", default: Money.default_currency
   end
 end
 

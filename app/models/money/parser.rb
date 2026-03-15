@@ -12,7 +12,7 @@ class Money::Parser
     return Money.new(nil) if @value.blank?
 
     @str = @value.to_s.strip
-    @currency = extract_symbol || extract_code || "USD"
+    @currency = extract_symbol || extract_code || Money.default_currency
 
     Money.new(BigDecimal(@str.delete(",")), @currency)
   end

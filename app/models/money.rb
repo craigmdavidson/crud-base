@@ -8,9 +8,11 @@ class Money
 
   SYMBOLS_FOR_CURRENCY = CURRENCY_SYMBOLS.invert.freeze
 
+  class_attribute :default_currency, default: "USD"
+
   attr_reader :amount, :currency
 
-  def initialize(amount, currency = "USD")
+  def initialize(amount, currency = self.class.default_currency)
     @amount = amount
     @currency = currency
   end
