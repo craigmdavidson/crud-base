@@ -1,12 +1,12 @@
 class AutoController
   module AutoRouteable
     extend ActiveSupport::Concern
-    
+
     included do
       @root_routes = []
-      @nested_routes = Hash.new { |h, k| h[k] = [] }      
+      @nested_routes = Hash.new { |h, k| h[k] = [] }
     end
-    
+
     class_methods do
       def root_routes
         AutoController.instance_variable_get(:@root_routes)
@@ -43,7 +43,7 @@ class AutoController
             end
           end
         end
-      end      
+      end
     end
   end
 end

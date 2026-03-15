@@ -4,7 +4,7 @@ class AutoController
 
 
     private
-    
+
     def resource_scope
       return model.all unless scope
 

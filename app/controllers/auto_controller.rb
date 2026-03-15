@@ -1,6 +1,6 @@
 class AutoController < ApplicationController
   include AutoRouteable, Parameterizable, Resourced
-  
+
   layout "auto"
 
   helper_method :resource, :resources, :permitted_attributes, :table_attributes
@@ -55,7 +55,7 @@ class AutoController < ApplicationController
   end
 
   private
-  
+
   def resource_params
     params.require(model.model_name.param_key).permit(permitted_attributes)
   end
